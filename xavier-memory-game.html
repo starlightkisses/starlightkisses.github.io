@@ -257,8 +257,8 @@
   .external-links {
     display: flex;
     justify-content: center;
-    gap: 14px;
-    flex-wrap: wrap;
+    gap: 6px;
+    flex-wrap: nowrap;
     margin-top: 30px;
     padding-top: 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.16);
@@ -269,9 +269,9 @@
     overflow: hidden;
     display: inline-block;
     font-family: var(--font);
-    font-size: 0.95rem;
+    font-size: 0.68rem;
     font-weight: 700;
-    padding: 10px 24px;
+    padding: 9px 6px;
     border-radius: 18px;
     text-decoration: none;
     color: var(--starlight);
@@ -280,6 +280,11 @@
     box-shadow: 0 4px 14px rgba(20, 16, 43, 0.4), inset 0 1px 0 rgba(255,255,255,0.35);
     cursor: pointer;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
+    flex: 1 1 0;
+    min-width: 0;
+    text-align: center;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .link-btn::before {
@@ -422,6 +427,86 @@
     gap: 16px;
     max-width: 320px;
     margin: 0 auto;
+  }
+
+  .diff-heading-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .diff-heading-row h2 { margin-bottom: 0; }
+
+  .help-badge {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid var(--glass-border);
+    background: linear-gradient(135deg, rgba(255, 233, 179, 0.7), rgba(201, 184, 240, 0.7));
+    color: #000;
+    font-family: var(--font);
+    font-size: 0.85rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(255, 233, 179, 0.35);
+  }
+  .help-badge:active { transform: scale(0.92); }
+
+  .help-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(12, 8, 28, 0.6);
+    backdrop-filter: blur(4px);
+  }
+  .help-modal.hidden { display: none; }
+
+  .help-card {
+    position: relative;
+    width: 100%;
+    max-width: 320px;
+    max-height: 80vh;
+    overflow-y: auto;
+    background: linear-gradient(160deg, rgba(66, 47, 120, 0.95), rgba(24, 18, 50, 0.97));
+    border: 1px solid var(--glass-border);
+    border-radius: 22px;
+    padding: 24px 20px 20px;
+    color: var(--starlight);
+    text-align: left;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  }
+
+  .help-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    color: var(--moon-gold);
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  .help-card p { font-size: 0.85rem; line-height: 1.45; margin-bottom: 10px; }
+  .help-card ul { margin: 0 0 10px 18px; padding: 0; }
+  .help-card li { font-size: 0.82rem; line-height: 1.5; margin-bottom: 4px; }
+
+  .help-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--glass-border);
+    background: rgba(255,255,255,0.08);
+    color: var(--starlight);
+    font-size: 0.9rem;
+    cursor: pointer;
   }
 
   .diff-btn {
@@ -763,7 +848,10 @@
 
   <!-- ================= START SCREEN ================= -->
   <div id="start-screen">
-    <h2>Choose your difficulty</h2>
+    <div class="diff-heading-row">
+      <h2>Choose your difficulty</h2>
+      <button type="button" id="help-btn" class="help-badge" aria-label="How to play">?</button>
+    </div>
     <div class="difficulty-options">
       <button class="diff-btn" data-diff="easy">Easy<small>12 pairs — 24 cards</small></button>
       <button class="diff-btn" data-diff="medium">Medium<small>16 pairs — 32 cards</small></button>
@@ -773,7 +861,8 @@
 
         <div class="external-links">
       <a href="https://starlightkisses.github.io/" target="_blank" rel="noopener" class="link-btn">My Other Works</a>
-      <a href="https://ko-fi.com/YOUR_KOFI_USERNAME" target="_blank" rel="noopener" class="link-btn">Ko-Fi ☕</a>
+      <a href="https://ko-fi.com/starlitbride_" target="_blank" rel="noopener" class="link-btn">Ko-Fi ☕</a>
+      <a href="https://ngl.link/starlitbride_/bit" target="_blank" rel="noopener" class="link-btn">Feedback/Text me ♡</a>
     </div>
     </div>
 
@@ -824,6 +913,23 @@
     </div>
   </div>
 </div>
+</div>
+
+<div id="help-modal" class="help-modal hidden">
+  <div class="help-card">
+    <button type="button" id="help-close-btn" class="help-close" aria-label="Close">✕</button>
+    <h3>How to Play ✦</h3>
+    <p><strong>Xavier Memory Match</strong> is a cozy card-matching game — find every matching pair before you run out of moves (or time, in Challenge mode)!</p>
+    <p><strong>How to play:</strong> Tap any two cards to flip them. If they match, they stay face-up. If not, they flip back — remember their spots for next time!</p>
+    <p><strong>Difficulty levels:</strong></p>
+    <ul>
+      <li><strong>Easy</strong> — 12 pairs, no time pressure</li>
+      <li><strong>Medium</strong> — 16 pairs, a bit more of a challenge</li>
+      <li><strong>Hard</strong> — 20 pairs, for sharp memories</li>
+      <li><strong>Challenge</strong> — 24 pairs, beat the 4:00 clock!</li>
+    </ul>
+    <p>Match every pair to win. Good luck! ⋆｡✦</p>
+  </div>
 </div>
 
 <div class="credit">Designed &amp; created by Ru (<a href="https://twitter.com/starlitbride_" target="_blank" rel="noopener">@starlitbride_</a>)</div>
@@ -1000,6 +1106,17 @@
 
   document.getElementById('restart-btn').addEventListener('click', () => startGame(currentDifficulty));
   document.getElementById('change-diff-btn').addEventListener('click', showStartScreen);
+  const helpModal = document.getElementById('help-modal');
+  document.getElementById('help-btn').addEventListener('click', () => {
+    helpModal.classList.remove('hidden');
+  });
+  document.getElementById('help-close-btn').addEventListener('click', () => {
+    helpModal.classList.add('hidden');
+  });
+  helpModal.addEventListener('click', (e) => {
+    if (e.target === helpModal) helpModal.classList.add('hidden');
+  });
+
   document.getElementById('win-change-diff-btn').addEventListener('click', showStartScreen);
   document.getElementById('challenge-win-exit-btn').addEventListener('click', showStartScreen);
   document.getElementById('timeout-exit-btn').addEventListener('click', showStartScreen);
