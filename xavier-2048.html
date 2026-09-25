@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Xavier 2048</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,7 +28,14 @@
     background: radial-gradient(ellipse at 50% -10%, var(--sky) 0%, var(--void) 55%, #020308 100%);
     color: var(--ink);
     font-family: 'Inter', system-ui, sans-serif;
-    overflow-x: hidden;
+    overflow: hidden;
+    overscroll-behavior: none;
+    touch-action: none;
+  }
+  body{
+    position: fixed;
+    inset: 0;
+    width: 100%;
   }
 
   #particles{
@@ -98,9 +105,14 @@
   .wrap{
     position: relative; z-index: 1;
     max-width: 480px;
+    width: 100%;
     margin: 0 auto;
-    padding: 28px 20px 60px;
-    min-height: 100vh;
+    padding: calc(18px + env(safe-area-inset-top, 0px)) 18px calc(14px + env(safe-area-inset-bottom, 0px));
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    touch-action: none;
+    box-sizing: border-box;
   }
 
   header{
@@ -181,36 +193,164 @@
 
   .toolbar{
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 10px;
     margin-bottom: 16px;
-    gap: 12px;
   }
   .toolbar-buttons{
     display: flex;
-    gap: 8px;
+    gap: 6px;
+    justify-content: space-between;
   }
   .hint{
-    font-size: 0.78rem;
+    font-size: 0.72rem;
     color: var(--ink-dim);
     line-height: 1.4;
+  }
+  .hint-row{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .help-badge{
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(160deg, var(--gold), var(--gold-soft));
+    color: #1a1206;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(255,210,122,0.5);
+  }
+  .help-badge:active{ transform: scale(0.92); }
+
+  .help-modal{
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(2,3,8,0.72);
+    backdrop-filter: blur(4px);
+  }
+  .help-modal.hidden{ display: none; }
+
+  .help-card{
+    position: relative;
+    width: 100%;
+    max-width: 320px;
+    max-height: 82vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    overscroll-behavior: contain;
+    background: linear-gradient(165deg, #1c2542 0%, var(--board) 100%);
+    border: 1px solid rgba(255,210,122,0.3);
+    border-radius: 18px;
+    padding: 22px 18px 18px;
+    color: var(--ink);
+    text-align: left;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+  }
+
+  .help-card h3{
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--gold);
+    text-align: center;
+    margin: 0 0 10px;
+  }
+  .help-card p{
+    font-size: 0.8rem;
+    line-height: 1.45;
+    color: var(--ink-dim);
+    margin: 0 0 10px;
+  }
+  .chain-label{
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold-soft) !important;
+    font-weight: 600;
+    margin-bottom: 8px !important;
+  }
+
+  .merge-chain{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .merge-row{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,210,122,0.12);
+    border-radius: 10px;
+    padding: 6px;
+  }
+  .merge-row img{
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: var(--cell);
+  }
+  .merge-row .op, .merge-row .arrow{
+    font-size: 0.85rem;
+    color: var(--ink-dim);
+    flex-shrink: 0;
+  }
+  .merge-row .val{
+    font-size: 0.62rem;
+    color: var(--ink-dim);
+    display: block;
+    text-align: center;
+  }
+
+  .help-close{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,210,122,0.3);
+    background: rgba(255,255,255,0.06);
+    color: var(--ink);
+    font-size: 0.85rem;
+    cursor: pointer;
   }
   .new-game{
     background: linear-gradient(160deg, var(--gold), var(--gold-soft));
     color: #2a1a05;
     border: none;
     border-radius: 10px;
-    padding: 10px 18px;
+    padding: 9px 4px;
     font-family: 'Inter', sans-serif;
     font-weight: 600;
-    font-size: 0.82rem;
-    letter-spacing: 0.02em;
+    font-size: 0.58rem;
+    letter-spacing: 0;
     cursor: pointer;
     box-shadow: 0 4px 16px rgba(255,210,122,0.35);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     text-decoration: none;
+    text-align: center;
     display: inline-block;
+    flex: 1 1 0;
+    min-width: 0;
   }
   .new-game:hover{ transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,210,122,0.45); }
   .new-game:active{ transform: translateY(0); }
@@ -226,6 +366,8 @@
     background: linear-gradient(160deg, #1c2542 0%, var(--board) 100%);
     border-radius: 16px;
     padding: 12px;
+    margin: 0 auto;
+    box-sizing: border-box;
     box-shadow:
       0 0 0 1px rgba(255,210,122,0.14),
       0 20px 60px -20px rgba(0,0,0,0.8),
@@ -339,7 +481,7 @@
     border-radius: 12px;
     font-family: 'Inter', sans-serif;
     font-weight: 700;
-    transition: transform 0.15s ease-in-out, opacity 0.1s ease;
+    transition: transform 0.15s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.1s ease;
     will-change: transform;
   }
 
@@ -498,6 +640,25 @@
     text-shadow: 0 0 10px rgba(255,210,122,0.5);
   }
 
+  .top-credit{
+    margin: 0 0 10px;
+    text-align: center;
+    color: var(--ink-dim);
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+  }
+  .top-credit a{
+    color: var(--gold);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.15s ease, text-shadow 0.15s ease;
+  }
+  .top-credit a:hover{
+    color: var(--gold-soft);
+    text-shadow: 0 0 10px rgba(255,210,122,0.5);
+  }
+
   @media (prefers-reduced-motion: reduce){
     .particle{ animation: none; display:none; }
     .tile{ transition: none; }
@@ -510,6 +671,7 @@
 <div id="particles"></div>
 
 <div class="wrap">
+  <p class="top-credit">Designed and created by Ru (<a href="https://twitter.com/starlitbride_" target="_blank" rel="noopener noreferrer">@starlitbride_</a>)</p>
   <header>
     <div class="title-block">
       <h1>Nocturne</h1>
@@ -528,10 +690,15 @@
   </header>
 
   <div class="toolbar">
-    <div class="hint">Swipe, or use the<br>arrow keys.</div>
+    <div class="hint-row">
+      <div class="hint">Swipe, or use the arrow keys.</div>
+      <button type="button" id="help-btn" class="help-badge" aria-label="How to play">?</button>
+    </div>
     <div class="toolbar-buttons">
       <a class="new-game ghost" href="https://starlightkisses.github.io/" target="_blank" rel="noopener noreferrer">My other works</a>
       <button class="new-game" id="newGame">New Game</button>
+      <a class="new-game ghost" href="https://ko-fi.com/starlitbride_" target="_blank" rel="noopener noreferrer">✦ Ko-fi</a>
+      <a class="new-game ghost" href="https://ngl.link/starlitbride_/bit" target="_blank" rel="noopener noreferrer">Text me ♡</a>
     </div>
   </div>
 
@@ -575,7 +742,18 @@
 
 </div>
 
+<div id="help-modal" class="help-modal hidden">
+  <div class="help-card">
+    <button type="button" id="help-close-btn" class="help-close" aria-label="Close">✕</button>
+    <h3>How to Play</h3>
+    <p>Swipe (or use the arrow keys) to slide every tile in that direction. Two tiles with the <strong>same Xavier art</strong> merge into the next tier when they collide. Keep merging to reach the crowned prince at 2048 — and beyond!</p>
+    <p class="chain-label">Merge chain:</p>
+    <div id="merge-chain" class="merge-chain"></div>
+  </div>
+</div>
+
 <script>
+
 (function(){
   const SIZE = 4;
   const boardEl = document.getElementById('board');
@@ -617,6 +795,7 @@
     overlay.classList.remove('show');
     addRandomTile();
     addRandomTile();
+    fitBoard();
     measure();
     renderFull();
   }
@@ -672,6 +851,64 @@
 
   function tileImageSrc(value){
     return TILE_IMAGES[value] || TILE_IMAGE_HI;
+  }
+
+  // Build the "which image + which image = which image" legend straight
+  // from TILE_IMAGES, so it can never drift out of sync with the board art.
+  function buildMergeChain(){
+    const chainEl = document.getElementById('merge-chain');
+    if(!chainEl) return;
+    const tiers = Object.keys(TILE_IMAGES).map(Number).sort((a,b) => a-b);
+    let html = '';
+    tiers.forEach((value, i) => {
+      const nextValue = value * 2;
+      const nextSrc = TILE_IMAGES[nextValue] || TILE_IMAGE_HI;
+      const nextLabel = TILE_IMAGES[nextValue] ? String(nextValue) : (nextValue + '+');
+      html += `
+        <div class="merge-row">
+          <div><img src="${TILE_IMAGES[value]}" alt="${value}"><span class="val">${value}</span></div>
+          <span class="op">+</span>
+          <div><img src="${TILE_IMAGES[value]}" alt="${value}"><span class="val">${value}</span></div>
+          <span class="arrow">→</span>
+          <div><img src="${nextSrc}" alt="${nextLabel}"><span class="val">${nextLabel}</span></div>
+        </div>`;
+    });
+    chainEl.innerHTML = html;
+  }
+  buildMergeChain();
+
+  const helpModal = document.getElementById('help-modal');
+  document.getElementById('help-btn').addEventListener('click', () => {
+    helpModal.classList.remove('hidden');
+  });
+  document.getElementById('help-close-btn').addEventListener('click', () => {
+    helpModal.classList.add('hidden');
+  });
+  helpModal.addEventListener('click', (e) => {
+    if(e.target === helpModal) helpModal.classList.add('hidden');
+  });
+
+  // Sizes the board-frame square to exactly fit whatever room is left
+  // between the toolbar and the footer inside the fixed-height .wrap,
+  // so nothing ever needs to scroll on any phone screen.
+  const wrapEl = document.querySelector('.wrap');
+  const boardFrameEl = document.querySelector('.board-frame');
+  const footerEl = document.querySelector('footer');
+  function fitBoard(){
+    if(!wrapEl || !boardFrameEl || !footerEl) return;
+    const wrapRect = wrapEl.getBoundingClientRect();
+    const wrapStyle = getComputedStyle(wrapEl);
+    const padLeft = parseFloat(wrapStyle.paddingLeft) || 0;
+    const padRight = parseFloat(wrapStyle.paddingRight) || 0;
+    const naturalWidth = wrapRect.width - padLeft - padRight;
+
+    const frameRect = boardFrameEl.getBoundingClientRect();
+    const footerRect = footerEl.getBoundingClientRect();
+    const footerMarginTop = parseFloat(getComputedStyle(footerEl).marginTop) || 0;
+    const availableHeight = (footerRect.top - footerMarginTop) - frameRect.top;
+
+    const size = Math.max(140, Math.min(naturalWidth, availableHeight));
+    boardFrameEl.style.width = size + 'px';
   }
 
   function measure(){
@@ -947,7 +1184,10 @@
 
   newGameBtn.addEventListener('click', init);
 
-  window.addEventListener('resize', () => { measure(); renderFull(); });
+  window.addEventListener('resize', () => { fitBoard(); measure(); renderFull(); });
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => { fitBoard(); measure(); renderFull(); }, 60);
+  });
 
   // Ambient particles — a lot of fireflies and drifting hearts together
   function spawnParticles(){
