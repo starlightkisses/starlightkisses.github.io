@@ -269,6 +269,25 @@ button.ghost:hover{
 }
   button:disabled{ opacity:.4; cursor:not-allowed; }
 
+  /* help button */
+  .help-btn{
+    width: 24px; height: 24px; min-width:24px;
+    padding: 0; border-radius: 50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Cinzel', serif; font-weight:600; font-size: 0.72rem;
+    line-height:1;
+    background: rgba(20,26,61,0.7);
+    color: var(--gold);
+    border: 1px solid var(--gold);
+    box-shadow: 0 0 8px rgba(201,168,118,0.25);
+    text-shadow:none;
+    flex-shrink:0;
+  }
+  .help-btn:hover{
+    background: rgba(51,64,126,0.7);
+    box-shadow: 0 0 12px rgba(201,168,118,0.45);
+  }
+
   /* modal */
   .overlay{
     position:fixed; inset:0; background:rgba(6,8,20,0.72);
@@ -288,6 +307,32 @@ button.ghost:hover{
     margin: 0 0 8px; letter-spacing:.04em;
   }
   .modal p{ font-family:'Cormorant Garamond', serif; font-size:1.05rem; color:var(--silver); margin: 0 0 18px; }
+
+  /* help modal specific */
+  .modal.help-modal{
+    max-width: 400px;
+    max-height: 82vh;
+    overflow-y: auto;
+    text-align:left;
+  }
+  .modal.help-modal h2{ text-align:center; }
+  .modal.help-modal h3{
+    font-family:'Cinzel',serif; color:var(--gold); font-size:0.95rem;
+    letter-spacing:.03em; margin: 18px 0 6px;
+  }
+  .modal.help-modal h3:first-of-type{ margin-top:4px; }
+  .modal.help-modal p, .modal.help-modal li{
+    font-family:'Cormorant Garamond', serif; font-size:1rem;
+    color:var(--silver); line-height:1.5; margin:0 0 6px;
+  }
+  .modal.help-modal ol, .modal.help-modal ul{ margin:0 0 4px; padding-left:20px; }
+  .modal.help-modal b{ color:var(--moonlight); }
+  .help-kofi{
+    display:block; text-align:center; margin-top:18px;
+    font-family:'Inter',sans-serif; font-weight:600; font-size:0.8rem;
+    color: var(--gold); text-decoration:none;
+  }
+  .help-kofi:hover{ text-decoration:underline; }
 
   /* certificate */
   .cert-wrap{ display:flex; justify-content:center; margin-bottom:16px; }
@@ -412,6 +457,7 @@ button.ghost:hover{
     <div class="status-row">
   <div class="status-line" id="statusLine">24 fates await. 0 revealed.</div>
   <button id="skipBtn" class="skip skip-sm">Skip</button>
+  <button id="helpBtn" class="ghost help-btn" type="button" aria-label="How to play" title="How to play">?</button>
 </div>
 <div class="nudge" id="nudgeMsg">That's not it — look again.</div>
   </div>
@@ -443,7 +489,7 @@ button.ghost:hover{
   <div id="linksPanel" style="margin-top:28px; margin-bottom:28px; text-align:center;">
     <div class="btn-row">
       <a href="https://starlightkisses.github.io/" target="_blank" rel="noopener noreferrer" class="link-btn shimmer-rosegold">My Other Works</a>
-      <a href="#" target="_blank" rel="noopener noreferrer" class="link-btn shimmer-rosegold">☕ Ko-fi</a>
+      <a href="https://ko-fi.com/starlitbride_" target="_blank" rel="noopener noreferrer" class="link-btn shimmer-rosegold">☕ Ko-fi</a>
     </div>
   </div>
 
@@ -462,6 +508,39 @@ button.ghost:hover{
     <div class="btn-row">
       <button id="claimBingoBtn">Claim Bingo</button>
       <button id="keepGoingBtn" class="ghost">Keep Going</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="helpOverlay" style="display:none;">
+  <div class="modal help-modal">
+    <h2>✦ How to Play ✦</h2>
+    <p style="text-align:center; margin-bottom:16px;">The Xavier Bingo is a moonlit bingo game — mark off phrases on your card as they're called, and race to complete a line (or the whole card).</p>
+
+    <h3>Playing a round</h3>
+    <ol>
+      <li>Press <b>Begin</b> to get your card and the first call.</li>
+      <li>Each call shows a number and a phrase, e.g. <b>#7</b> — a clue.</li>
+      <li>Find the matching cell on your card and tap it. A wrong tap just shakes — try again.</li>
+      <li>Once you mark the right cell, the next call appears automatically.</li>
+    </ol>
+
+    <h3>Winning</h3>
+    <ul>
+      <li><b>Bingo</b> — complete any full row, column, or diagonal. You can then choose to <b>Claim Bingo</b> and finish, or <b>Keep Going</b> toward a Full House.</li>
+      <li><b>Full House</b> — mark every cell on the card. This is the top tier and gets its own certificate.</li>
+    </ul>
+
+    <h3>The Skip button</h3>
+    <p>Stuck on the current call? Tap <b>Skip</b> to give up on it and move straight to the next one. The skipped cell stays unmarked for the rest of that round — it won't be called again — so use it if a phrase has you stumped, not just to speed things up.</p>
+
+    <h3>After you finish</h3>
+    <p>You'll get a shareable certificate — download it as an image, and if you got a Bingo or Full House, you can submit your time to the leaderboard. Use <b>New Card</b> or <b>Play Again</b> to start fresh anytime.</p>
+
+    <a class="help-kofi" href="https://ko-fi.com/starlitbride_" target="_blank" rel="noopener noreferrer">☕ Enjoyed it? Support on Ko-fi</a>
+
+    <div class="btn-row" style="margin-top:18px;">
+      <button id="closeHelpBtn" class="ghost">Got it</button>
     </div>
   </div>
 </div>
@@ -1153,6 +1232,15 @@ var WIN_IMAGES_DATA = [
 });
   playAgainBtn.addEventListener('click', resetToStart);
 
+  var helpBtn = document.getElementById('helpBtn');
+  var helpOverlay = document.getElementById('helpOverlay');
+  var closeHelpBtn = document.getElementById('closeHelpBtn');
+  helpBtn.addEventListener('click', function(){ helpOverlay.style.display = 'flex'; });
+  closeHelpBtn.addEventListener('click', function(){ helpOverlay.style.display = 'none'; });
+  helpOverlay.addEventListener('click', function(e){
+    if(e.target === helpOverlay) helpOverlay.style.display = 'none';
+  });
+
   buildNewCard();
   renderGrid();
   updateStatus();
@@ -1163,4 +1251,3 @@ var WIN_IMAGES_DATA = [
 
 </body>
 </html>
-
