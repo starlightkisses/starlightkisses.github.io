@@ -1610,6 +1610,35 @@
 
     const DIMS = ["W", "I", "P", "G", "R", "S"];
 
+    /* ===== calibration =====
+       Raw answer scores drift upward (almost every answer adds points), so they
+       overshoot the card vectors and one "middle-high" card wins for everyone.
+       Fix: work out what an average set of answers scores per dimension, and
+       rescale player scores onto the same mean/spread as the card pool before
+       matching. Computed from QUESTIONS/CARDS, so it stays correct if you edit
+       either one later. */
+    const CAL = (() => {
+      const user = {}, pool = {};
+      const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
+      const sd = (a, m) => Math.sqrt(a.reduce((x, v) => x + (v - m) * (v - m), 0) / a.length) || 1;
+
+      DIMS.forEach(dim => {
+        let m = 5, variance = 0;
+        QUESTIONS.forEach(q => {
+          const vals = q.options.map(o => o.delta[dim] || 0);
+          const qm = mean(vals);
+          m += qm;
+          variance += vals.reduce((x, v) => x + (v - qm) * (v - qm), 0) / vals.length;
+        });
+        user[dim] = { mean: m, sd: Math.sqrt(variance) || 1 };
+
+        const cv = Object.values(CARDS).map(c => c.vector[dim]);
+        const cm = mean(cv);
+        pool[dim] = { mean: cm, sd: sd(cv, cm) };
+      });
+      return { user, pool };
+    })();
+
     let current = 0;
     let cameFromPreview = false;
     let userVector = { W: 5, I: 5, P: 5, G: 5, R: 5, S: 5 };
@@ -1684,7 +1713,9 @@
         let dist = 0;
 
         DIMS.forEach(dim => {
-          const diff = clamp(userVector[dim]) - vec[dim];
+          const z = (userVector[dim] - CAL.user[dim].mean) / CAL.user[dim].sd;
+          const scaled = clamp(CAL.pool[dim].mean + z * CAL.pool[dim].sd);
+          const diff = scaled - vec[dim];
           dist += diff * diff;
         });
 
