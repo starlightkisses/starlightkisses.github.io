@@ -79,9 +79,12 @@ h1{
   margin:0; color:var(--cream); font-size:clamp(31px,8vw,52px); letter-spacing:3px; text-transform:uppercase;
   text-shadow:0 0 18px rgba(240,144,74,.45), 0 0 46px rgba(240,144,74,.18);
 }
-.sub{ margin:9px 0 25px; color:var(--dim); font-size:14px; letter-spacing:1.5px; }
+.sub{ margin:9px 0 8px; color:var(--dim); font-size:14px; letter-spacing:1.5px; }
 .sub a{ color:var(--amber-glow); text-decoration:none; }
 .sub a:hover{ text-decoration:underline; }
+.thanks{ margin:0 auto 25px; max-width:520px; color:var(--dim); font-size:11px; letter-spacing:.4px; line-height:1.7; }
+.thanks a{ color:var(--amber-glow); text-decoration:none; }
+.thanks a:hover{ text-decoration:underline; }
 
 
 /* ==========================================================================
@@ -441,6 +444,70 @@ h1{
 .preview-grid figcaption{ font-size:9px; color:var(--dim); text-align:center; margin-top:4px; line-height:1.3; }
 
 
+
+/* ==========================================================================
+   12b. HELP BUTTON + "HOW TO PLAY" POPUP
+   ========================================================================== */
+.display{ position:relative; }
+.help-btn{
+  position:absolute; top:8px; right:9px; z-index:2;
+  width:26px; height:26px; padding:0; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Poppins','Helvetica Neue',Arial,sans-serif; font-size:14px; font-weight:600; line-height:1;
+  color:#2a1707; cursor:pointer;
+  border:1px solid rgba(196,110,40,.55);
+  background:linear-gradient(180deg, var(--amber-glow) 0%, var(--amber-warm) 55%, var(--amber-dim) 100%);
+  box-shadow:0 4px 12px rgba(240,144,74,.35), inset 0 1px 2px rgba(255,255,255,.8), inset 0 -4px 6px rgba(196,110,40,.4);
+  transition:transform .15s, filter .15s;
+}
+.help-btn:hover{ transform:translateY(-1px); filter:brightness(1.08); }
+.help-btn:active{ transform:translateY(1px); }
+.help-btn:focus-visible, .help-close:focus-visible, .help-ok:focus-visible{ outline:2px solid var(--cream); outline-offset:2px; }
+
+.help-overlay{
+  position:fixed; inset:0; z-index:90; display:flex; align-items:center; justify-content:center; padding:18px;
+  background:rgba(5,6,12,.62); backdrop-filter:blur(7px); -webkit-backdrop-filter:blur(7px);
+  opacity:0; visibility:hidden; transition:opacity .3s ease, visibility .3s ease;
+}
+.help-overlay.show{ opacity:1; visibility:visible; }
+.help-modal{
+  position:relative; width:min(380px,100%); max-height:84vh; overflow-y:auto;
+  padding:26px 22px 22px; border-radius:22px; text-align:left; color:var(--cream);
+  background:linear-gradient(180deg, rgba(24,27,44,.97), rgba(12,14,24,.98));
+  border:1px solid rgba(240,144,74,.35);
+  box-shadow:0 30px 70px rgba(0,0,0,.6), 0 0 50px rgba(240,144,74,.12), inset 0 1px 0 rgba(255,255,255,.05);
+  transform:translateY(10px) scale(.97); transition:transform .3s ease;
+}
+.help-overlay.show .help-modal{ transform:none; }
+.help-close{
+  position:absolute; top:10px; right:12px; width:28px; height:28px; padding:0; border:0; border-radius:50%;
+  background:transparent; color:var(--dim); font-size:16px; line-height:1; cursor:pointer;
+}
+.help-close:hover{ color:var(--amber-glow); }
+.help-modal h2{ margin:0 0 8px; padding-right:28px; font-size:19px; color:var(--cream); text-shadow:0 0 14px rgba(240,144,74,.35); }
+.help-modal h3{ margin:20px 0 8px; font-size:15px; color:var(--amber-glow); }
+.help-modal p{ margin:0; font-size:13.5px; line-height:1.65; color:var(--cream); }
+.help-modal ol{ margin:0; padding-left:20px; font-size:13.5px; line-height:1.65; }
+.help-modal li{ margin-bottom:5px; }
+.help-modal li::marker{ color:var(--amber-dim); }
+.help-modal .help-tags{ color:var(--amber-glow); }
+.help-modal .help-limit{ margin-top:12px; color:var(--dim); }
+.help-warn{
+  margin-top:16px !important; padding:10px 12px; border-radius:12px; font-size:12.5px !important;
+  background:rgba(240,144,74,.08); border:1px solid rgba(240,144,74,.28);
+}
+.help-ok{
+  display:block; margin:18px auto 0; padding:10px 32px; border-radius:999px; cursor:pointer;
+  font-family:inherit; font-size:12.5px; letter-spacing:.5px; color:#2a1707;
+  border:1px solid rgba(196,110,40,.5);
+  background:linear-gradient(180deg, var(--amber-glow) 0%, var(--amber-warm) 52%, var(--amber-dim) 100%);
+  box-shadow:0 6px 16px rgba(240,144,74,.35), inset 0 1px 2px rgba(255,255,255,.8), inset 0 -6px 10px rgba(196,110,40,.4);
+}
+.help-ok:hover{ filter:brightness(1.08); }
+@media (prefers-reduced-motion:reduce){
+  .help-overlay, .help-modal, .help-btn{ transition:none; }
+}
+
 /* ==========================================================================
    13. RESPONSIVE
    ========================================================================== */
@@ -572,11 +639,13 @@ h1{
     <div class="kicker">Welcome to a special Xavier Birthday Event.</div>
     <h1>Xavier: Starrylight Pool</h1>
     <div class="sub">✦Designed & created by <a href="https://x.com/starlitbride_" target="_blank" rel="noopener">Ru(@starlitbride_)</a>✦</div>
+    <div class="thanks">Special thanks to <a href="https://x.com/aeritzh" target="_blank" rel="noopener">Aeri (@aeritzh)</a> and <a href="https://x.com/xavslittlelight" target="_blank" rel="noopener">Alex (@xavslittlelight)</a> for their Lumiere and "Secret" prompts respectively.</div>
 
     <div class="machine">
       <div class="machine-title">Share your results using #Xavier1016HappyBirthday or #XavierStarlightGacha</div>
 
       <div class="display">
+        <button class="help-btn" id="helpBtn" type="button" aria-label="How to play" aria-haspopup="dialog">?</button>
         <div class="display-label">YOUR NUMBER</div>
         <div class="numbers">
           <div class="digit" id="d1">?</div>
@@ -612,6 +681,25 @@ h1{
   </div>
 
   
+
+  <!-- How to play popup -->
+  <div class="help-overlay" id="helpOverlay" aria-hidden="true">
+    <div class="help-modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+      <button class="help-close" id="helpClose" type="button" aria-label="Close">✕</button>
+      <h2 id="helpTitle">Xavier Starrylight Pool </h2>
+      <p>A little birthday gacha for Xavier. Pull a number and see what the stars give you: a letter, a card, or something extra special.</p>
+      <h3>What to do</h3>
+      <ol>
+        <li>Press <b>PULL</b>.</li>
+        <li>Wait for your number to lock in.</li>
+        <li>Tap to open your result.</li>
+        <li>Save it and share it with <span class="help-tags">#Xavier1016HappyBirthday</span> or <span class="help-tags">#XavierStarlightGacha</span>.</li>
+      </ol>
+      <p class="help-limit">Pulls are limited, but they refresh after a while.</p>
+      <p class="help-warn">⚠️ <b>18+ notice:</b> the rarest results are for mature readers. Pull at your own discretion.</p>
+      <button class="help-ok" id="helpOk" type="button">Got it</button>
+    </div>
+  </div>
 
 <script>
 /* ==========================================================================
@@ -702,4 +790,652 @@ const BLN_POOL = [
   ["Lost Signal", "cards/r/Xavier_Lost_Signal_middle.png"],
   ["Love Syndrome", "cards/r/Xavier_Love_Syndrome_middle.png"],
   ["Moments Refined", "cards/r/Xavier_Moments_Refined_middle.png"],
-  ["Moment's Respite", "cards/r/Xavier_Moment's_Respite_midd
+  ["Moment's Respite", "cards/r/Xavier_Moment's_Respite_middle.png"],
+  ["Nocturnal Hunt", "cards/r/Xavier_Nocturnal_Hunt_middle.png"],
+  ["Perfect Sunset", "cards/r/Xavier_Perfect_Sunset_middle.webp"],
+  ["Planned Crush", "cards/r/Xavier_Planned_Crush_middle.png"],
+  ["Seeker Of Light", "cards/r/Xavier_Seeker_Of_Light_middle.png"],
+  ["Shimmering Sunlight", "cards/r/Xavier_Shimmering_Sunlight_middle.png"],
+  ["Shining Light", "cards/r/Xavier_Shining_Light_middle.png"],
+  ["Shining Traces", "cards/r/Xavier_Shining_Traces_middle.png"],
+  ["Spring Letter", "cards/r/Xavier_Spring_Letter_middle.png"],
+  ["Starry Sound", "cards/r/Xavier_Starry_Sound_middle.png"],
+  ["Starry Witness", "cards/r/Xavier_Starry_Witness_middle.png"],
+  ["Succumb", "cards/r/Xavier_Succumb_middle.png"],
+  ["Sweetness Pursuit", "cards/r/Xavier_Sweetness_Pursuit_middle.png"],
+  ["Twofold Heartbeat", "cards/r/Xavier_Twofold_Heartbeat_middle.png"],
+  ["Unreturned Traveler", "cards/r/Xavier_Unreturned_Traveler_middle.png"],
+  ["Veiled Guardian", "cards/r/Xavier_Veiled_Guardian_middle.png"],
+  ["Veiled Starlight", "cards/r/Xavier_Veiled_Starlight_middle.png"],
+  ["Warm Wishes", "cards/r/Xavier_Warm_Wishes_middle.png"],
+  ["Winter's Sun", "cards/r/Xavier_Winter's_Sun_middle.png"]
+];
+
+const SR_POOL = [
+  ["21 Days", "cards/sr/21_Days.webp"],
+  ["Blades with Blossoms", "cards/sr/Blades_with_Blossoms.webp"],
+  ["Celestial Message", "cards/sr/Celestial_Message.jpg"],
+  ["Coolsplash Soak", "cards/sr/Coolsplash_Soak.webp"],
+  ["Deluded Fiction", "cards/sr/Deluded_Fiction.webp"],
+  ["Eulogy of Light", "cards/sr/Eulogy_of_Light.webp"],
+  ["Faint Sensation", "cards/sr/Faint_Sensation.webp"],
+  ["Feverish Attempts", "cards/sr/Feverish_Attempts.webp"],
+  ["Floof Attack", "cards/sr/Floof_Attack.webp"],
+  ["Floral Blessing", "cards/sr/Floral_Blessing.webp"],
+  ["Fragment Of Time", "cards/sr/Fragment_Of_Time.webp"],
+  ["Heartstring Symphony", "cards/sr/Heartstring_Symphony.webp"],
+  ["Inflorescence Imprints", "cards/sr/Inflorescence_Imprints.webp"],
+  ["Misty Silhouette", "cards/sr/Misty_Silhouette.webp"],
+  ["No Restraint", "cards/sr/No_Restraint.webp"],
+  ["Offbeat Track", "cards/sr/Offbeat_Track.webp"],
+  ["Precious Bonfire", "cards/sr/Precious_Bonfire.webp"],
+  ["Tender Night", "cards/sr/Tender_Night.webp"],
+  ["Tranquil Moments", "cards/sr/Tranquil_Moments.webp"],
+  ["Unique Aftertaste", "cards/sr/Unique_Aftertaste.webp"],
+  ["Between Stars", "cards/sr/Between_Stars.png"],
+  ["Fluffy Trap", "cards/sr/Fluffy_Trap.png"]
+];
+
+const SSR_POOL = [
+  ["Lightseeking Obsession", "cards/ssr/Lightseeking_Obsession.webp"],
+  ["Lightseeking Shadowrend", "cards/ssr/Lightseeking_Shadowrend.webp"],
+  ["Midnight Rainfall", "cards/ssr/Midnight_Rainfall.webp"],
+  ["Midnight Whispers", "cards/ssr/Midnight_Whispers.webp"],
+  ["Nightvow Mooncurse", "cards/ssr/Nightvow_Mooncurse.webp"],
+  ["Nightvow Requiem", "cards/ssr/Nightvow_Requiem.webp"]
+];
+
+/* ==========================================================================
+   3. CONTENT — Secret tier (990–999)
+   --------------------------------------------------------------------------
+   Each entry is ["Title", "Description"]. One is picked at random when
+   the pulled number lands in 990–999.
+   ========================================================================== */
+
+const SECRET_POOL = [
+  ["Being a Good Girl for Xavier", "Xavier loves it when you are trapped under his body, pliant as he worships you from head to toe with his hands, tongue, lips, and even teeth. Your breath mingles with his for every heated kiss, and your nails dig into his skin, giving him both pain and pleasure."],
+  ["A Rush of Adrenaline", "The battle is over, and Xavier teleports you two to an alley. You cling to him with your legs and arms wrapped around his body like vines while planting kisses to his jawline. He presses you against the wall, unable to wait any longer, and removes the dirty gloves to touch you."],
+  ["An Lazy Morning With Xavier", "You wake up to a sleepy Xavier nuzzling your neck while peppering sweet, gentle kisses to your skin. However, the innocent act of affection can't distract you from the hardness poking at your thigh. What a lovely way to start your day."],
+  ["A Very… Very Rough Night", "Pent up after weeks of being busy and having no time with each other, you and Xavier start making out when barely arriving at your home. Desperate hands cling to warm, needy bodies, pulling the one another flush against each other."],
+  ["Hunter's Association After Hours", "You have to stay back to work overtime one day, and Xavier offers to accompany you. But you didn't expect the overtime work would include this much kissing and a quickie in the heartquarters' bathroom."],
+  ["Stress Relief", "Xavier has noticed how stressed you have been recently due to heavy workload and decided that he can be your stress relief toy. After all, this collar looks so pretty on him, and he can't wait to serve his beloved."],
+  ["Jealousy Goes Both Ways", "Xavier knows he gets jealous easily. But he feels a bit unwanted when you always act nonchalant even when he baits you to get jealous . So one can only imagine his surprise when you drag him home from a short interaction with a stranger, right before he gets pinned down and marked as yours."]
+];
+
+
+/* ==========================================================================
+   4. SCATTER ENGINE
+   --------------------------------------------------------------------------
+   Every tier is split into small chunks (some "Better Luck," some
+   reward), then those chunks are shuffled into a fixed, unpredictable
+   order using a seeded random generator. "Seeded" means it shuffles the
+   same way every single time the page loads — so results stay
+   consistent for everyone — but the actual arrangement of chunks looks
+   scattered rather than sitting in one obvious block.
+   ========================================================================== */
+
+function mulberry32(seed){
+  return function(){
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function seededShuffle(arr, seed){
+  const rng = mulberry32(seed);
+  const out = arr.slice();
+  for(let i = out.length - 1; i > 0; i--){
+    const j = Math.floor(rng() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
+function layoutChunks(chunks, rangeStart){
+  let cursor = rangeStart;
+  return chunks.map(c => {
+    const start = cursor;
+    const end = cursor + c.size - 1;
+    cursor = end + 1;
+    return Object.assign({}, c, { start, end });
+  });
+}
+
+function findChunk(layout, number){
+  for(const c of layout){
+    if(number >= c.start && number <= c.end) return c;
+  }
+  return null;
+}
+
+function pick(arr){
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// --- N tier: 000–599, 30% Better Luck, 40 fixed content blocks ---------
+// 20 blocks of 11 + 20 blocks of 10 = 420 reward numbers.
+// 18 Better Luck blocks of 10 = 180 numbers. 420 + 180 = 600.
+const N_CHUNKS = [];
+for(let i = 0; i < N_CONTENT.length; i++){
+  N_CHUNKS.push({ type: "content", index: i, size: i < 20 ? 11 : 10 });
+}
+for(let i = 0; i < 18; i++){
+  N_CHUNKS.push({ type: "bln", size: 10 });
+}
+const N_LAYOUT = layoutChunks(seededShuffle(N_CHUNKS, 20260613), 0);
+
+// --- R tier: 600–849, 20% Better Luck (50 numbers), 200 random-pick ----
+const R_CHUNKS = [];
+for(let i = 0; i < 5; i++) R_CHUNKS.push({ type: "bln", size: 10 });
+R_CHUNKS.push({ type: "reward", size: 200 });
+const R_LAYOUT = layoutChunks(seededShuffle(R_CHUNKS, 41720260), 600);
+
+// --- SR tier: 850–949, 10% Better Luck (10 numbers), 90 random-pick ----
+const SR_CHUNKS = [
+  { type: "bln", size: 10 },
+  { type: "reward", size: 90 }
+];
+const SR_LAYOUT = layoutChunks(seededShuffle(SR_CHUNKS, 850613), 850);
+
+// --- SSR tier: 950–989, 5% Better Luck (2 numbers), 38 random-pick ------
+const SSR_CHUNKS = [
+  { type: "bln", size: 2 },
+  { type: "reward", size: 38 }
+];
+const SSR_LAYOUT = layoutChunks(seededShuffle(SSR_CHUNKS, 950613), 950);
+
+// --- Secret tier: 990–999, guaranteed, no Better Luck slice -------------
+// (10 numbers is too small to express any % below 10% cleanly — see the
+// earlier conversation. Left at 0% here; change if you want otherwise.)
+
+
+/* ==========================================================================
+   5. RESOLVE A PULLED NUMBER INTO A RESULT
+   ========================================================================== */
+
+function fallbackPair(pool, placeholderTitle, placeholderText){
+  if(pool.length === 0) return [placeholderTitle, placeholderText];
+  return pick(pool);
+}
+
+function resolveN(number){
+  const chunk = findChunk(N_LAYOUT, number);
+  if(chunk.type === "bln"){
+    const [title, text] = pick(BLN_POOL);
+    return { rarityLabel: "COMMON", cssClass: "bln", mode: "letter", title, text };
+  }
+  const [title, text] = N_CONTENT[chunk.index];
+  return { rarityLabel: "COMMON", cssClass: "common", mode: "letter", title, text };
+}
+
+function resolveR(number){
+  const chunk = findChunk(R_LAYOUT, number);
+  if(chunk.type === "bln"){
+    const [title, text] = pick(BLN_POOL);
+    return { rarityLabel: "RARE", cssClass: "bln", mode: "letter", title, text };
+  }
+  const [title, img] = fallbackPair(R_POOL, "Coming Soon", "cards/r/PUT_4STAR_CARDS_HERE.txt");
+  return { rarityLabel: "RARE", cssClass: "rare", mode: "card", title, img, stars: 4 };
+}
+
+function resolveSR(number){
+  const chunk = findChunk(SR_LAYOUT, number);
+  if(chunk.type === "bln"){
+    const [title, text] = pick(BLN_POOL);
+    return { rarityLabel: "SUPER RARE", cssClass: "bln", mode: "letter", title, text };
+  }
+  const [title, img] = pick(SR_POOL);
+  return { rarityLabel: "SUPER RARE", cssClass: "super", mode: "card", title, img, stars: 5 };
+}
+
+function resolveSSR(number){
+  const chunk = findChunk(SSR_LAYOUT, number);
+  if(chunk.type === "bln"){
+    const [title, text] = pick(BLN_POOL);
+    return { rarityLabel: "MYTH", cssClass: "bln", mode: "letter", title, text };
+  }
+  const [title, img] = pick(SSR_POOL);
+  return { rarityLabel: "MYTH", cssClass: "ultra", mode: "card", title, img, myth: true };
+}
+
+function resolveSecret(number){
+  const [title, text] = fallbackPair(SECRET_POOL, "Coming Soon", "Add your own 5 entries in SECRET_POOL — see the comment above it in the code.");
+  return { rarityLabel: "SECRET", cssClass: "secret", mode: "letter", title, text };
+}
+
+function getReward(number){
+  if(number <= 599) return resolveN(number);
+  if(number <= 849) return resolveR(number);
+  if(number <= 949) return resolveSR(number);
+  if(number <= 989) return resolveSSR(number);
+  return resolveSecret(number);
+}
+
+
+/* ==========================================================================
+   6. DOM REFERENCES
+   ========================================================================== */
+
+const digits = [document.getElementById("d1"), document.getElementById("d2"), document.getElementById("d3")];
+const pullButton = document.getElementById("pull");
+const statusEl    = document.getElementById("status");
+
+const blurOverlay  = document.getElementById("blurOverlay");
+const envelopeWrap = document.getElementById("envelopeWrap");
+const envelope     = document.getElementById("envelope");
+const revealBtn    = document.getElementById("revealBtn");
+const particleBurst = document.getElementById("particleBurst");
+
+const letter        = document.getElementById("letter");
+const letterBadgeEl  = document.getElementById("letterBadge");
+const letterTitleEl  = document.getElementById("letterTitle");
+const letterTextEl   = document.getElementById("letterText");
+const letterRollEl   = document.getElementById("letterRoll");
+const saveLetterBtn  = document.getElementById("saveLetter");
+const pullAgainLetterBtn = document.getElementById("pullAgainLetter");
+
+const cardResult    = document.getElementById("cardResult");
+const cardArtEl      = document.getElementById("cardArt");
+const cardRarityMarkEl = document.getElementById("cardRarityMark");
+const cardTitleEl    = document.getElementById("cardTitle");
+const saveCardBtn    = document.getElementById("saveCard");
+const pullAgainCardBtn = document.getElementById("pullAgainCard");
+
+
+
+
+/* ==========================================================================
+   7. STATE
+   ========================================================================== */
+
+let hasPulled = false;
+let revealTimers = [];
+let currentResult = null;
+
+/* ---- Pull limit: 60 pulls, then a 16-hour cooldown ---- */
+const MAX_PULLS = 60;
+const COOLDOWN_MS = 16 * 60 * 60 * 1000;
+const LIMIT_KEY = "xavierGachaLimit";
+
+function getLimitData(){
+  let data;
+  try { data = JSON.parse(localStorage.getItem(LIMIT_KEY)) || { count: 0, lockUntil: null }; }
+  catch(e){ data = { count: 0, lockUntil: null }; }
+  if(data.lockUntil && Date.now() >= data.lockUntil){
+    data = { count: 0, lockUntil: null };
+    localStorage.setItem(LIMIT_KEY, JSON.stringify(data));
+  }
+  return data;
+}
+
+function formatTimeLeft(ms){
+  const totalMinutes = Math.ceil(ms / 60000);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+}
+
+function applyLimitState(){
+  const data = getLimitData();
+  if(data.lockUntil && Date.now() < data.lockUntil){
+    pullButton.disabled = true;
+    statusEl.textContent = `COME BACK IN ${formatTimeLeft(data.lockUntil - Date.now())}`;
+    return false;
+  }
+  return true;
+}
+
+function registerPull(){
+  const data = getLimitData();
+  data.count += 1;
+  if(data.count >= MAX_PULLS) data.lockUntil = Date.now() + COOLDOWN_MS;
+  localStorage.setItem(LIMIT_KEY, JSON.stringify(data));
+}
+
+
+/* ==========================================================================
+   8. PULL ANIMATION
+   ========================================================================== */
+
+const REEL_LOCK_DELAYS_MS = [900, 1200, 1500];
+
+function startPull(){
+  if(!applyLimitState()) return;
+  registerPull();
+  hasPulled = true;
+  pullButton.disabled = true;
+  statusEl.textContent = "CALCULATING...";
+  digits.forEach(d => d.classList.add("spinning"));
+
+  const number = Math.floor(Math.random() * 1000);
+  const final = String(number).padStart(3, "0");
+
+  digits.forEach(d => { d.textContent = Math.floor(Math.random() * 10); });
+
+  digits.forEach((digit, i) => {
+    setTimeout(() => {
+      digit.textContent = final[i];
+      digit.classList.remove("spinning");
+      if(i === digits.length - 1) revealResult(number, final);
+    }, REEL_LOCK_DELAYS_MS[i]);
+  });
+}
+
+
+/* ==========================================================================
+   9. REVEAL RESULT
+   ========================================================================== */
+
+function revealResult(number, final){
+  currentResult = getReward(number);
+  currentResult.roll = "YOUR NUMBER: " + final;
+  statusEl.textContent = "PULL COMPLETE ✦";
+  playEnvelopeSequence();
+}
+
+function clearRevealTimers(){
+  revealTimers.forEach(clearTimeout);
+  revealTimers = [];
+}
+
+function playEnvelopeSequence(){
+  clearRevealTimers();
+  blurOverlay.classList.add("show");
+  envelopeWrap.classList.add("show");
+  revealTimers.push(setTimeout(() => revealBtn.classList.add("show"), 4000));
+}
+
+function showResult()
+{
+  revealBtn.classList.remove("show");
+  envelopeWrap.classList.add("fade");
+
+  const r = currentResult;
+  const badgeText = r.cssClass === "bln" ? "" : "✦ " + r.rarityLabel + " ✦";
+
+  if(r.mode === "card"){
+    playParticleBurst(r, () => revealCard(r));
+  } else {
+    letterBadgeEl.textContent = badgeText;
+    letterBadgeEl.className = "badge " + r.cssClass;
+    letterTitleEl.textContent = r.title;
+    letterTextEl.textContent = r.text;
+    letterRollEl.textContent = r.roll;
+    letter.classList.add("out");
+    revealTimers.push(setTimeout(() => letter.classList.add("glow"), 250));
+  }
+}
+
+function revealCard(r){
+  cardArtEl.src = r.img;
+  cardArtEl.alt = r.title;
+  cardTitleEl.textContent = r.title;
+  if(r.myth){
+  cardRarityMarkEl.innerHTML = '<div class="card-myth-badge">✦ MYTH ✦</div>';
+} else if(r.stars === 4){
+  cardRarityMarkEl.innerHTML = '<div class="card-planets">' + '<svg class="planet-icon"><use href="#planet-mark"></use></svg>'.repeat(4) + '</div>';
+} else {
+  cardRarityMarkEl.innerHTML = '<div class="card-stars-3d">' + '<svg class="star3d-icon"><use href="#star3d-mark"></use></svg>'.repeat(r.stars) + '</div>';
+}
+  cardResult.classList.add("out");
+  revealTimers.push(setTimeout(() => cardResult.classList.add("glow"), 250));
+}
+
+
+/* ==========================================================================
+   9c. PARTICLE BURST LOGIC
+   --------------------------------------------------------------------------
+   Myth (SSR)  -> stars + hearts + confetti
+   5★ (SR)     -> stars only
+   4★ (R)      -> confetti only
+   ========================================================================== */
+
+const REDUCE_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const CONFETTI_COLORS = ["#ffc370", "#f0904a", "#f5ead2", "#e2c6ff", "#9ecfff"];
+
+function particleTypesForCard(r){
+  if(r.myth) return ["star", "heart", "confetti"];
+  if(r.stars === 5) return ["star"];
+  return ["confetti"];
+}
+
+function spawnParticles(types, count){
+  for(let i = 0; i < count; i++){
+    const type = types[Math.floor(Math.random() * types.length)];
+    const el = document.createElement("div");
+    el.className = "particle " + type;
+
+    const duration = 1.1 + Math.random() * 0.7;
+    const delay = Math.random() * 0.45;
+    el.style.left = Math.random() * 100 + "%";
+    el.style.animationDuration = duration + "s";
+    el.style.animationDelay = delay + "s";
+    el.style.setProperty("--spin", ((Math.random() > 0.5 ? 1 : -1) * (180 + Math.random() * 360)) + "deg");
+
+    if(type === "star"){ el.textContent = "★"; }
+    else if(type === "heart"){ el.textContent = "♥"; }
+    else{
+      el.style.background = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+      el.style.width = (6 + Math.random() * 5) + "px";
+      el.style.height = (10 + Math.random() * 8) + "px";
+    }
+
+    particleBurst.appendChild(el);
+    setTimeout(() => el.remove(), (duration + delay) * 1000 + 150);
+  }
+}
+
+function playParticleBurst(r, onDone){
+  if(REDUCE_MOTION){
+    onDone();
+    return;
+  }
+
+  const types = particleTypesForCard(r);
+  const count = window.innerWidth < 480 ? 22 : 30;
+
+  spawnParticles(types, count);
+  particleBurst.classList.add("show");
+
+  revealTimers.push(setTimeout(() => {
+    particleBurst.classList.remove("show");
+  }, 1500));
+
+  revealTimers.push(setTimeout(() => {
+    particleBurst.innerHTML = "";
+    onDone();
+  }, 2000));
+}
+
+
+/* ==========================================================================
+   10. SAVE LETTER AS IMAGE (canvas-drawn parchment card)
+   ========================================================================== */
+
+const RARITY_INK = { common:"#8d7452", bln:"#9c9184", rare:"#a86a24", super:"#9a5414", ultra:"#8a5a06", secret:"#6b3d00" };
+const LETTER_FONT = 'Georgia,"Palatino Linotype","Times New Roman",serif';
+
+function wrapCanvasText(ctx, text, maxWidth){
+  const words = text.split(" ");
+  const lines = [];
+  let line = "";
+  words.forEach(word => {
+    const test = line ? line + " " + word : word;
+    if(line && ctx.measureText(test).width > maxWidth){ lines.push(line); line = word; }
+    else { line = test; }
+  });
+  if(line) lines.push(line);
+  return lines;
+}
+
+function roundedRectPath(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function drawTrackedText(ctx, text, centerX, y, spacing){
+  const chars = [...text];
+  const widths = chars.map(c => ctx.measureText(c).width);
+  const totalWidth = widths.reduce((a, b) => a + b, 0) + spacing * (chars.length - 1);
+  let x = centerX - totalWidth / 2;
+  const prevAlign = ctx.textAlign;
+  ctx.textAlign = "left";
+  chars.forEach((c, i) => { ctx.fillText(c, x, y); x += widths[i] + spacing; });
+  ctx.textAlign = prevAlign;
+}
+
+function saveLetterAsImage(){
+  saveLetterBtn.disabled = true;
+  try{
+    const SCALE = 2, width = 480, padX = 40, padTop = 46, padBottom = 42;
+    const contentWidth = width - padX * 2;
+    const rarityClass = [...letterBadgeEl.classList].find(c => c !== "badge") || "common";
+    const ink = RARITY_INK[rarityClass] || RARITY_INK.common;
+
+    const measure = document.createElement("canvas").getContext("2d");
+    measure.font = `bold 24px ${LETTER_FONT}`;
+    const titleLines = wrapCanvasText(measure, letterTitleEl.textContent, contentWidth);
+    measure.font = `14.5px ${LETTER_FONT}`;
+    const bodyLines = wrapCanvasText(measure, letterTextEl.textContent, contentWidth);
+
+    const badgeH = 22, titleLH = 30, bodyLH = 25, rollH = 16;
+    const gapBadge = 8, gapTitle = 10, gapBody = 16;
+    const height = padTop + badgeH + gapBadge + titleLines.length * titleLH + gapTitle
+      + bodyLines.length * bodyLH + gapBody + rollH + padBottom;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width * SCALE; canvas.height = height * SCALE;
+    const ctx = canvas.getContext("2d");
+    ctx.scale(SCALE, SCALE);
+
+    ctx.save();
+    ctx.shadowColor = "rgba(240,144,74,.55)"; ctx.shadowBlur = 24;
+    ctx.fillStyle = "#f1e3c2";
+    roundedRectPath(ctx, 8, 8, width - 16, height - 16, 6); ctx.fill();
+    ctx.restore();
+
+    const grad = ctx.createLinearGradient(0, 0, 0, height);
+    grad.addColorStop(0, "#fbf3e0"); grad.addColorStop(1, "#f1e3c2");
+    ctx.fillStyle = grad;
+    roundedRectPath(ctx, 0, 0, width, height, 6); ctx.fill();
+
+    ctx.strokeStyle = "rgba(180,130,60,.5)"; ctx.lineWidth = 1;
+    roundedRectPath(ctx, .5, .5, width - 1, height - 1, 6); ctx.stroke();
+
+    let y = padTop;
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+
+    ctx.fillStyle = ink; ctx.font = `bold 12px ${LETTER_FONT}`;
+    drawTrackedText(ctx, letterBadgeEl.textContent, width / 2, y, 4);
+    y += badgeH + gapBadge;
+
+    ctx.fillStyle = "#241407"; ctx.font = `bold 24px ${LETTER_FONT}`;
+    titleLines.forEach(line => { ctx.fillText(line, width / 2, y); y += titleLH; });
+    y += gapTitle;
+
+    ctx.fillStyle = "#4a3319"; ctx.font = `14.5px ${LETTER_FONT}`;
+    bodyLines.forEach(line => { ctx.fillText(line, width / 2, y); y += bodyLH; });
+    y += gapBody;
+
+    ctx.fillStyle = "#7a6a4f"; ctx.font = `11px ${LETTER_FONT}`;
+    drawTrackedText(ctx, letterRollEl.textContent, width / 2, y, 2);
+
+    const link = document.createElement("a");
+    link.download = "xavier-gacha-letter.png";
+    link.href = canvas.toDataURL("image/png");
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+  } catch(err){
+    console.error(err);
+    alert("Couldn't save the letter this time — please try again.");
+  } finally {
+    saveLetterBtn.disabled = false;
+  }
+}
+
+function saveCardImage(){
+  const link = document.createElement("a");
+  link.download = (currentResult.title || "xavier-card").replace(/\s+/g, "-") + ".webp";
+  link.href = cardArtEl.src;
+  document.body.appendChild(link); link.click(); document.body.removeChild(link);
+}
+
+
+/* ==========================================================================
+   11. RESET
+   ========================================================================== */
+
+function resetMachine(){
+  hasPulled = false;
+
+  digits.forEach(d => { d.textContent = "?"; d.classList.remove("spinning"); });
+
+  clearRevealTimers();
+  blurOverlay.classList.remove("show");
+  envelopeWrap.classList.remove("show", "fade");
+  envelope.classList.remove("open");
+  revealBtn.classList.remove("show");
+  letter.classList.remove("out", "glow");
+  cardResult.classList.remove("out", "glow");
+  particleBurst.classList.remove("show");
+  particleBurst.innerHTML = "";
+  
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  if(applyLimitState()){
+    pullButton.disabled = false;
+    statusEl.textContent = "PRESS PULL";
+  }
+}
+
+
+
+
+/* ==========================================================================
+   13. EVENT LISTENERS
+   ========================================================================== */
+
+pullButton.addEventListener("click", () => { if(!hasPulled) startPull(); });
+revealBtn.addEventListener("click", showResult);
+saveLetterBtn.addEventListener("click", saveLetterAsImage);
+saveCardBtn.addEventListener("click", saveCardImage);
+pullAgainLetterBtn.addEventListener("click", resetMachine);
+pullAgainCardBtn.addEventListener("click", resetMachine);
+
+/* ==========================================================================
+   14. HOW-TO-PLAY POPUP
+   ========================================================================== */
+
+const helpBtn     = document.getElementById("helpBtn");
+const helpOverlay = document.getElementById("helpOverlay");
+const helpClose   = document.getElementById("helpClose");
+const helpOk      = document.getElementById("helpOk");
+
+function openHelp(){
+  helpOverlay.classList.add("show");
+  helpOverlay.setAttribute("aria-hidden", "false");
+  helpOk.focus();
+}
+function closeHelp(){
+  helpOverlay.classList.remove("show");
+  helpOverlay.setAttribute("aria-hidden", "true");
+  helpBtn.focus();
+}
+
+helpBtn.addEventListener("click", openHelp);
+helpClose.addEventListener("click", closeHelp);
+helpOk.addEventListener("click", closeHelp);
+helpOverlay.addEventListener("click", e => { if(e.target === helpOverlay) closeHelp(); });
+document.addEventListener("keydown", e => {
+  if(e.key === "Escape" && helpOverlay.classList.contains("show")) closeHelp();
+});
+
+applyLimitState();
+</script>
+</body>
+</html>
