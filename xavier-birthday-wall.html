@@ -476,6 +476,20 @@
     max-width: 90vw;
     text-align: center;
   }
+      .wish-count {
+    margin: 14px 0 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: #c9a36a;
+  }
+
+  .wish-count.loading { animation: soft-pulse 1.4s ease-in-out infinite; }
+
+  @keyframes soft-pulse {
+    0%, 100% { opacity: 0.45; }
+    50%      { opacity: 1; }
+  }
 </style>
 </head>
 <body>
@@ -485,6 +499,7 @@
   <div class="eyebrow">Designed & created <strong>Ru</strong> (<a href="https://x.com/starlitbride_" target="_blank" rel="noopener" style="color: inherit; font-weight: 600; text-decoration: underline;">@starlitbride_</a>)</div>
   <h1>Wall of birthday wishes by Little Stars, <em>for Xavier</em></h1>
   <p class="sub">Leave a message and watch it find its place among the others. The wall keeps growing — but every note stays.</p>
+      <p id="wishCount" class="wish-count loading">Gathering the stars...</p>
 </header>
 
 <div id="wall-scroll">
@@ -582,7 +597,7 @@ async function loadMessages() {
     return Array.isArray(data) ? data : [];
   } catch (err) {
     console.error('Could not load messages from the sheet:', err);
-    return [];
+    return null;   // null = the load failed (not the same as an empty wall)
   }
 }
 
@@ -745,13 +760,28 @@ function layoutNotes(items, hubRect) {
   }
   return { results, height: Math.max(WALL_MIN_H, Math.ceil(bottom) + 130) };
 }
+const wishCount = document.getElementById('wishCount');
+let wallLoaded = false;
+
+function setCounter(n) {
+  wishCount.classList.remove('loading');
+  if (n === 'error') {
+    wishCount.textContent = "Couldn't load the wall. Please try refreshing the page.";
+  } else if (n === 0) {
+    wishCount.textContent = 'Be the first little star to leave a wish ✦';
+  } else if (n === 1) {
+    wishCount.textContent = '1 little star has left a wish';
+  } else {
+    wishCount.textContent = `${n} little stars have left a wish`;
+  }
+}
 
 let cachedMessages = [];
 let wallCentered = false;
 
 function drawWall(messages) {
+  if (wallLoaded) setCounter(messages.length);
   wall.style.width = WALL_W + 'px';
-  wall.querySelectorAll('.note').forEach(n => n.remove());
 
   // oldest first, so earlier notes keep their spot when new ones are added
   const sorted = messages
@@ -810,12 +840,15 @@ function drawWall(messages) {
 }
 
 async function refreshWall() {
-  cachedMessages = await loadMessages();
-  drawWall(cachedMessages);
-  // fonts can change how tall a note is, so lay out once more when they're ready
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(() => drawWall(cachedMessages));
+  const loaded = await loadMessages();
+  if (loaded === null) {
+    setCounter('error');
+    return;
   }
+  if (document.fonts && document.fonts.ready) await document.fonts.ready;
+  wallLoaded = true;
+  cachedMessages = loaded;
+  drawWall(cachedMessages);
 }
 
 /* ============================================================
