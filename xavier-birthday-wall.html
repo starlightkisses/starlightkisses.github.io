@@ -782,6 +782,7 @@ let wallCentered = false;
 function drawWall(messages) {
   if (wallLoaded) setCounter(messages.length);
   wall.style.width = WALL_W + 'px';
+  wall.querySelectorAll('.note').forEach(n => n.remove());
 
   // oldest first, so earlier notes keep their spot when new ones are added
   const sorted = messages
@@ -1028,11 +1029,7 @@ submitBtn.addEventListener('click', () => {
   });
 });
 
-  await saveMessage(note);
-  closePanel();
-  submitBtn.textContent = 'Pin it to the wall';
-  await refreshWall();
-});
+    
 /* ============================================================
    FALLING STARS
    ============================================================ */
