@@ -295,10 +295,7 @@
 
   .cta-side:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(150,130,170,0.3); }
 
-  #cta:hover { transform: translateX(-50%) translateY(-2px); box-shadow: 0 12px 28px rgba(185,166,224,0.5); }
-
-  #cta:active { transform: translateX(-50%) translateY(0); }
-
+ 
   /* modal */
   #overlay {
     position: fixed;
@@ -463,6 +460,22 @@
     0%, 100% { filter: brightness(1); }
     50%      { filter: brightness(1.8); }
   }
+      #toast {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #b5546b;
+    color: #fff;
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    box-shadow: 0 8px 24px rgba(91,84,104,0.3);
+    z-index: 300;
+    display: none;
+    max-width: 90vw;
+    text-align: center;
+  }
 </style>
 </head>
 <body>
@@ -575,15 +588,15 @@ async function loadMessages() {
 
 async function saveMessage(note) {
   try {
-    // text/plain avoids a CORS "preflight" request that Apps Script
-    // web apps don't handle well — the script still parses it as JSON.
-    await fetch(SCRIPT_URL, {
+    const res = await fetch(SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(note)
     });
+    return res.ok;
   } catch (err) {
     console.error('Could not save message to the sheet:', err);
+    return false;
   }
 }
 
@@ -933,11 +946,20 @@ function validate() {
   banWarning.style.display = flagged ? 'block' : 'none';
   submitBtn.disabled = !(nameInput.value.trim() && msgInput.value.trim()) || !!flagged;
 }
-
-submitBtn.addEventListener('click', async () => {
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Pinning...';
-
+let toastTimer;
+function showToast(text) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    document.body.appendChild(t);
+  }
+  t.textContent = text;
+  t.style.display = 'block';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.style.display = 'none'; }, 5000);
+}
+submitBtn.addEventListener('click', () => {
   const note = {
     name: nameInput.value.trim().slice(0, 24),
     message: msgInput.value.trim().slice(0, 180),
@@ -945,10 +967,33 @@ submitBtn.addEventListener('click', async () => {
     angle: state.angle,
     color: state.color,
     icon: NOTE_ICONS[Math.floor(Math.random() * NOTE_ICONS.length)],
-    x: 0,   // the wall now places every note itself, so no position is stored
+    x: 0,
     y: 0,
     ts: Date.now()
   };
+
+  // show it on the wall right away
+  cachedMessages = [...cachedMessages, note];
+  closePanel();
+
+  // let the window close first, then redraw the wall
+  setTimeout(() => drawWall(cachedMessages), 50);
+
+  // save to Google Sheets quietly in the background
+    saveMessage(note).then(ok => {
+    if (ok) return;
+    // save failed: take the note off the wall and give the person their text back
+    cachedMessages = cachedMessages.filter(m => m !== note);
+    drawWall(cachedMessages);
+    nameInput.value = note.name;
+    msgInput.value = note.message;
+    charCount.textContent = note.message.length;
+    updatePreview();
+    validate();
+    openPanel();
+    showToast("Couldn't save your message, please try again.");
+  });
+});
 
   await saveMessage(note);
   closePanel();
