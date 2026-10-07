@@ -121,31 +121,31 @@
   #hub {
     position: absolute;
     left: 50%;
-    top: 340px;
+    top: 350px;
     transform: translate(-50%, -50%);
-    width: 260px;
-    height: 260px;
+    width: 320px;
     z-index: 5;
     text-align: center;
   }
 
   #hub .portrait {
-    width: 220px;
-    height: 220px;
+    width: 300px;
     margin: 0 auto 14px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #ffffff, #ece3f5 70%);
+    padding: 6px;
+    background: #ffffff;
     border: 2px solid #cbb98e;
+    border-radius: 6px;
     box-shadow: 0 0 0 8px rgba(203,185,142,0.12), 0 0 50px rgba(185,166,224,0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
   }
 
-  /* Replace this SVG with an <img src="your-xavier-photo.jpg"> for the real artwork */
-  #hub .portrait svg { width: 62%; height: 62%; opacity: 0.85; }
+  /* aspect-ratio matches the card (1240 x 1748) so the wall can reserve its space before the picture loads */
+  #hub .portrait img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1240 / 1748;
+    border-radius: 3px;
+  }
 
   #hub .hub-label {
     font-family: 'Cormorant Garamond', serif;
@@ -478,13 +478,7 @@
   <div id="wall">
     <div id="hub">
       <div class="portrait">
-        <!-- Placeholder art. Swap this <svg> for <img src="xavier.jpg" style="width:100%;height:100%;object-fit:cover;"> -->
-        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#c9a36a" stroke-width="1.4">
-          <circle cx="50" cy="36" r="14"/>
-          <path d="M20 20 L28 26 M80 20 L72 26" stroke-linecap="round"/>
-          <path d="M50 50 C 30 55, 22 75, 22 88 L78 88 C78 75, 70 55, 50 50 Z"/>
-          <path d="M50 10 L52 16 L58 16 L53 20 L55 26 L50 22 L45 26 L47 20 L42 16 L48 16 Z" fill="#c9a36a" stroke="none"/>
-        </svg>
+        <img src="xavier-card.jpg" alt="Happy Birthday Xavier">
       </div>
       <div class="hub-label">happy birthday to our star prince</div>
     </div>
@@ -495,7 +489,7 @@
 <div id="cta-row">
   <a class="cta-side" href="https://starlightkisses.github.io/" target="_blank" rel="noopener">My Other Works</a>
   <button id="cta">✦ Leave a birthday message for Xavier</button>
-  <a class="cta-side" href="#" target="_blank" rel="noopener">☕ Ko-Fi</a>
+  <a class="cta-side" href="https://ko-fi.com/starlitbride_" target="_blank" rel="noopener">☕ Ko-Fi</a>
 </div>
 
 <div id="overlay">
@@ -509,6 +503,7 @@
     <label for="msgInput">Your message</label>
     <textarea id="msgInput" rows="3" maxlength="180" placeholder="Say happy birthday..."></textarea>
     <div class="char-count"><span id="charCount">0</span>/180</div>
+    <div id="banWarning" style="display:none; color:#b5546b; font-size:0.82rem; margin:-8px 0 12px;">Please remove flagged word(s) before pinning.</div>
 
     <label>Size</label>
     <div class="option-row" id="sizeOptions">
@@ -601,79 +596,213 @@ async function saveMessage(note) {
    ============================================================ */
 
 const wall = document.getElementById('wall');
-const HUB_RADIUS = 170; // keep this clear zone around Xavier
-const NOTE_DIMS = { small: [150, 90], medium: [200, 110], large: [260, 140] };
+const wallScroll = document.getElementById('wall-scroll');
+const hub = document.getElementById('hub');
 
-function wallSize(count) {
-  // grows in stages every 10 notes
-  const stage = Math.floor(count / 10);
-  return {
-    width: 1400 + stage * 300,
-    height: 900 + stage * 220
-  };
+const WALL_W     = 1400;  // fixed width, so Xavier's card stays put while the wall grows downward
+const WALL_MIN_H = 900;
+const GAP        = 8;     // breathing room between notes that aren't touching
+const CORNER     = 16;    // how far two notes may overlap at a corner (scrapbook feel)
+const EDGE       = 12;    // keep notes this far from the wall's edges
+const HUB_CLEAR  = 24;    // clear zone around Xavier's card
+const CELL       = 160;   // size of the lookup cells used to speed up collision checks
+const STEP       = 12;    // spacing of the spots we try
+const SPREAD     = 0.5;   // below 1 = notes fan out sideways before stacking downward
+
+// The box a note really takes up once it is tilted
+function footprint(x, y, w, h, angle) {
+  const a = Math.abs(angle) * Math.PI / 180;
+  const bw = w * Math.cos(a) + h * Math.sin(a);
+  const bh = w * Math.sin(a) + h * Math.cos(a);
+  const cx = x + w / 2, cy = y + h / 2;
+  return { l: cx - bw / 2, r: cx + bw / 2, t: cy - bh / 2, b: cy + bh / 2 };
 }
 
-function pickPosition(size, wallW, wallH, existing) {
-  const [w, h] = NOTE_DIMS[size];
-  const hubX = wallW / 2;
-  const hubY = 340;
-  let best = null;
+// true = these two notes would cover each other too much
+function tooClose(a, b) {
+  const ox = Math.min(a.r, b.r) - Math.max(a.l, b.l);
+  const oy = Math.min(a.b, b.b) - Math.max(a.t, b.t);
+  if (ox <= -GAP || oy <= -GAP) return false;                           // clear of each other
+  if (ox > 0 && oy > 0 && ox <= CORNER && oy <= CORNER) return false;  // only the corners overlap
+  return true;
+}
 
-  for (let attempt = 0; attempt < 25; attempt++) {
-    const x = 40 + Math.random() * (wallW - w - 80);
-    const y = 40 + Math.random() * (wallH - h - 80);
-    const cx = x + w / 2, cy = y + h / 2;
-    const distFromHub = Math.hypot(cx - hubX, cy - hubY);
-    if (distFromHub < HUB_RADIUS) continue;
+// same spot -> same little wobble every visit, so the layout never reshuffles
+function wobble(x, y) {
+  const v = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+  return v - Math.floor(v);
+}
 
-    // count overlaps with existing notes (some overlap is fine/desired)
-    let overlaps = 0;
-    for (const n of existing) {
-      const dx = Math.abs(cx - n.cx), dy = Math.abs(cy - n.cy);
-      if (dx < (w + n.w) / 2 * 0.6 && dy < (h + n.h) / 2 * 0.6) overlaps++;
+// Every spot we may try, nearest to Xavier first
+function buildSpots(H, hubX, hubY) {
+  const cols = Math.ceil((WALL_W - 60 - 16) / STEP);
+  const rows = Math.ceil((H - 16) / STEP);
+  const raster = [];
+  for (let j = 0; j < rows; j++) {
+    for (let i = 0; i < cols; i++) {
+      const x = 16 + i * STEP, y = 16 + j * STEP;
+      const dx = x + 90 - hubX, dy = y + 60 - hubY;
+      raster.push({ x, y, s: Math.hypot(dx * SPREAD, dy) + wobble(x, y) * 40, dead: false });
     }
-    if (!best || overlaps < best.overlaps) {
-      best = { x, y, cx, cy, w, h, overlaps };
-    }
-    if (overlaps === 0) break;
   }
-  return best || { x: 60, y: 60, cx: 60 + w / 2, cy: 60 + h / 2, w, h };
+  const order = raster.slice().sort((p, q) => p.s - q.s);
+  return { raster, order, cols, rows };
+}
+
+// A spot whose top-left corner sits well inside a placed note (or Xavier's card)
+// can never be used again, so we skip it from then on. This keeps the layout quick.
+function retireSpots(grid, r, corner) {
+  const i0 = Math.max(0, Math.floor((r.l - 16) / STEP) + 1);
+  const i1 = Math.min(grid.cols - 1, Math.ceil((r.r - corner - 16) / STEP) - 1);
+  const j0 = Math.max(0, Math.floor((r.t - 16) / STEP) + 1);
+  const j1 = Math.min(grid.rows - 1, Math.ceil((r.b - corner - 16) / STEP) - 1);
+  for (let j = j0; j <= j1; j++) {
+    for (let i = i0; i <= i1; i++) {
+      const c = grid.raster[j * grid.cols + i];
+      if (c.x > r.l && c.x < r.r - corner && c.y > r.t && c.y < r.b - corner) c.dead = true;
+    }
+  }
+}
+
+function layoutNotes(items, hubRect) {
+  const hubX = (hubRect.l + hubRect.r) / 2;
+  const hubY = (hubRect.t + hubRect.b) / 2;
+  let H = WALL_MIN_H;
+  let grid = buildSpots(H, hubX, hubY);
+  retireSpots(grid, hubRect, -1);
+
+  const buckets = new Map();
+  const cellKeys = (fp, pad) => {
+    const keys = [];
+    for (let cx = Math.floor((fp.l - pad) / CELL); cx <= Math.floor((fp.r + pad) / CELL); cx++)
+      for (let cy = Math.floor((fp.t - pad) / CELL); cy <= Math.floor((fp.b + pad) / CELL); cy++)
+        keys.push(cx + ',' + cy);
+    return keys;
+  };
+
+  let stamp = 0;
+  const collides = fp => {
+    stamp++;
+    for (const k of cellKeys(fp, GAP)) {
+      const list = buckets.get(k);
+      if (!list) continue;
+      for (const o of list) {
+        if (o.q === stamp) continue;
+        o.q = stamp;
+        if (tooClose(fp, o)) return true;
+      }
+    }
+    return false;
+  };
+
+  const placed = [];
+  const results = [];
+  let bottom = 0;
+
+  for (const it of items) {
+    let found = null;
+    while (!found) {
+      for (const c of grid.order) {
+        if (c.dead) continue;
+        if (c.x + it.w > WALL_W - 16) continue;
+        const fp = footprint(c.x, c.y, it.w, it.h, it.angle);
+        if (fp.l < EDGE || fp.r > WALL_W - EDGE || fp.t < EDGE) continue;
+        // never on top of Xavier's card
+        if (fp.r > hubRect.l && fp.l < hubRect.r && fp.b > hubRect.t && fp.t < hubRect.b) continue;
+        if (collides(fp)) continue;
+        found = { x: c.x, y: c.y, fp };
+        break;
+      }
+      if (!found) {                       // out of room: grow the wall
+        H += 1200;
+        grid = buildSpots(H, hubX, hubY);
+        retireSpots(grid, hubRect, -1);
+        for (const f of placed) retireSpots(grid, f, CORNER + 1);
+      }
+    }
+    found.fp.q = 0;
+    for (const k of cellKeys(found.fp, 0)) {
+      if (!buckets.has(k)) buckets.set(k, []);
+      buckets.get(k).push(found.fp);
+    }
+    placed.push(found.fp);
+    retireSpots(grid, found.fp, CORNER + 1);
+    bottom = Math.max(bottom, found.fp.b);
+    results.push(found);
+  }
+  return { results, height: Math.max(WALL_MIN_H, Math.ceil(bottom) + 130) };
 }
 
 let cachedMessages = [];
+let wallCentered = false;
 
 function drawWall(messages) {
-  const { width, height } = wallSize(messages.length);
-  wall.style.width = width + 'px';
-  wall.style.minHeight = height + 'px';
+  wall.style.width = WALL_W + 'px';
+  wall.querySelectorAll('.note').forEach(n => n.remove());
 
-  document.querySelectorAll('.note').forEach(n => n.remove());
+  // oldest first, so earlier notes keep their spot when new ones are added
+  const sorted = messages
+    .map((m, i) => ({ m, i, ts: Number(m.ts) || 0 }))
+    .sort((a, b) => (a.ts - b.ts) || (a.i - b.i))
+    .map(o => o.m);
 
-    messages.forEach(m => {
+  const els = sorted.map(m => {
     const el = document.createElement('div');
     el.className = `note ${m.color} size-${m.size}`;
-    el.style.left = m.x + 'px';
-    el.style.top = m.y + 'px';
-    el.style.transform = `rotate(${m.angle}deg)`;
-    el.style.zIndex = 10 + Math.floor(Math.random() * 20);
+    el.style.left = '0px';
+    el.style.top = '0px';
+    el.style.transform = `rotate(${Number(m.angle) || 0}deg)`;
     el.innerHTML = `<div class="msg"></div><div class="from"></div>`;
     el.querySelector('.msg').textContent = m.message;
     el.querySelector('.from').textContent = `— ${m.name}`;
 
-    const icon = m.icon || NOTE_ICONS[0];
     const img = document.createElement('img');
     img.className = 'note-icon';
-    img.src = icon;
+    img.src = m.icon || NOTE_ICONS[0];
     img.alt = '';
     el.appendChild(img);
 
     wall.appendChild(el);
+    return el;
   });
+
+  // measure each note's real size, then find it a spot where it stays readable
+  const items = els.map((el, i) => ({
+    w: el.offsetWidth,
+    h: el.offsetHeight,
+    angle: Number(sorted[i].angle) || 0
+  }));
+
+  const hubCx = WALL_W / 2;
+  const hubCy = parseFloat(getComputedStyle(hub).top);
+  const hubRect = {
+    l: hubCx - hub.offsetWidth / 2 - HUB_CLEAR,
+    r: hubCx + hub.offsetWidth / 2 + HUB_CLEAR,
+    t: hubCy - hub.offsetHeight / 2 - HUB_CLEAR,
+    b: hubCy + hub.offsetHeight / 2 + HUB_CLEAR
+  };
+
+  const { results, height } = layoutNotes(items, hubRect);
+  els.forEach((el, i) => {
+    el.style.left = results[i].x + 'px';
+    el.style.top = results[i].y + 'px';
+    el.style.zIndex = 10 + (i % 20);
+  });
+  wall.style.minHeight = height + 'px';
+
+  if (!wallCentered) {   // on small screens, start the view on Xavier
+    wallScroll.scrollLeft = (wallScroll.scrollWidth - wallScroll.clientWidth) / 2;
+    wallCentered = true;
+  }
 }
 
 async function refreshWall() {
   cachedMessages = await loadMessages();
   drawWall(cachedMessages);
+  // fonts can change how tall a note is, so lay out once more when they're ready
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => drawWall(cachedMessages));
+  }
 }
 
 /* ============================================================
@@ -687,9 +816,63 @@ const submitBtn = document.getElementById('submitBtn');
 const nameInput = document.getElementById('nameInput');
 const msgInput = document.getElementById('msgInput');
 const charCount = document.getElementById('charCount');
+const banWarning = document.getElementById('banWarning');
 const previewNote = document.getElementById('previewNote');
 const previewMsg = document.getElementById('previewMsg');
 const previewName = document.getElementById('previewName');
+
+/* ============================================================
+   BANNED WORDS
+   Whole-word / whole-phrase matching only — a banned word only
+   blocks when it appears as its own word, not as part of a
+   longer innocent word (e.g. "die" blocks "die" but not "diet").
+   Leetspeak / symbol tricks (r@t, gr00mer) are still caught
+   because each word is normalized before comparison.
+   ============================================================ */
+
+const BANNED_WORDS = [
+  'groomiere','groomer','pedo','child','boring','sleepy','basic','pdf',
+  'musty','dusty','ugly','cheater','loser','rat','die',
+  'zayne','rafayel','sylus','caleb','valko','wolf','jasmine',
+  'bringbackvalko','valkoisloved'
+];
+
+const BANNED_PHRASES = [
+  ['child','pedo'],
+  ['non','existent'],
+  ['cant','cook'],
+  ['happy','death','day']
+];
+
+const LEET_MAP = { '0':'o','1':'i','!':'i','3':'e','4':'a','@':'a','5':'s','$':'s','7':'t','+':'t','8':'b','9':'g','|':'l' };
+
+function normalizeWord(raw){
+  let s = raw.toLowerCase();
+  s = s.split('').map(ch => LEET_MAP[ch] || ch).join('');
+  s = s.replace(/[^a-z]/g, ''); // strip everything but letters
+  s = s.replace(/(.)\1{2,}/g, '$1$1'); // raaat -> raat (mild repeat-collapse)
+  return s;
+}
+
+function findBannedMatch(text){
+  if(!text) return null;
+  const rawWords = text.split(/\s+/).filter(Boolean);
+  const words = rawWords.map(normalizeWord);
+
+  for(const w of words){
+    if(BANNED_WORDS.includes(w)) return w;
+  }
+  for(const phrase of BANNED_PHRASES){
+    for(let i = 0; i <= words.length - phrase.length; i++){
+      let match = true;
+      for(let j = 0; j < phrase.length; j++){
+        if(words[i+j] !== phrase[j]){ match = false; break; }
+      }
+      if(match) return phrase.join(' ');
+    }
+  }
+  return null;
+}
 
 let state = { size: 'medium', angle: 0, color: 'note-cream' };
 
@@ -698,6 +881,7 @@ function closePanel() {
   overlay.classList.remove('open');
   nameInput.value = ''; msgInput.value = '';
   charCount.textContent = '0';
+  banWarning.style.display = 'none';
   updatePreview();
   validate();
 }
@@ -742,19 +926,17 @@ function updatePreview() {
 }
 
 function validate() {
-  submitBtn.disabled = !(nameInput.value.trim() && msgInput.value.trim());
+  const nameMatch = findBannedMatch(nameInput.value);
+  const msgMatch = findBannedMatch(msgInput.value);
+  const flagged = nameMatch || msgMatch;
+
+  banWarning.style.display = flagged ? 'block' : 'none';
+  submitBtn.disabled = !(nameInput.value.trim() && msgInput.value.trim()) || !!flagged;
 }
 
 submitBtn.addEventListener('click', async () => {
   submitBtn.disabled = true;
   submitBtn.textContent = 'Pinning...';
-
-  const { width, height } = wallSize(cachedMessages.length + 1);
-  const placedSoFar = cachedMessages.map(m => {
-    const [w, h] = NOTE_DIMS[m.size];
-    return { cx: m.x + w / 2, cy: m.y + h / 2, w, h };
-  });
-  const pos = pickPosition(state.size, width, height, placedSoFar);
 
   const note = {
     name: nameInput.value.trim().slice(0, 24),
@@ -763,8 +945,8 @@ submitBtn.addEventListener('click', async () => {
     angle: state.angle,
     color: state.color,
     icon: NOTE_ICONS[Math.floor(Math.random() * NOTE_ICONS.length)],
-    x: Math.round(pos.x),
-    y: Math.round(pos.y),
+    x: 0,   // the wall now places every note itself, so no position is stored
+    y: 0,
     ts: Date.now()
   };
 
