@@ -122,6 +122,7 @@ h1{
 .digit.spinning{ animation:digitPulse .11s linear infinite; }
 @keyframes digitPulse{ 50%{ transform:translateY(2px); opacity:.6; } }
 .status{ min-height:22px; margin-top:16px; font-size:12px; letter-spacing:2px; color:var(--dim); }
+.pulls-left{ margin-top:6px; font-size:11px; letter-spacing:1.5px; color:var(--amber-dim); }
 
 
 /* ==========================================================================
@@ -653,9 +654,10 @@ h1{
           <div class="digit" id="d3">?</div>
         </div>
         <div class="status" id="status">PRESS PULL</div>
+        <div class="pulls-left" id="pullsLeft"></div>
       </div>
 
-            <div class="action-row">
+      <div class="action-row">
         <a class="side-btn" href="https://starlightkisses.github.io/" target="_blank" rel="noopener">My works</a>
 
         <button class="pull" id="pull">
@@ -663,8 +665,8 @@ h1{
           <img class="pull-bunny" src="bunbun.png" alt="">
         </button>
 
-        <!-- TODO: replace # with your Ko-fi link once it's live -->
-        <a class="side-btn" href="#" target="_blank" rel="noopener">☕ Ko-fi</a>
+      <a class="side-btn" href="https://ko-fi.com/starlitbride_" target="_blank" rel="noopener">☕ Ko-fi</a>
+        
       </div>
 
       <div class="odds">
@@ -680,7 +682,7 @@ h1{
     <div class="foot">XAVIER BIRTHDAY • 2026</div>
   </div>
 
-  
+
 
   <!-- How to play popup -->
   <div class="help-overlay" id="helpOverlay" aria-hidden="true">
@@ -706,7 +708,7 @@ h1{
    1. CONTENT — N tier (40 unique written blocks: your 30 originals +
       the 10 that moved over from the old Secret tier)
    ========================================================================== */
-   const N_CONTENT = [
+const N_CONTENT = [
   ["Sleepy Xavier", "You caught him napping. He refuses to get up."],
   ["Five More Minutes", "Xavier has negotiated five more minutes of sleep. It has been an hour."],
   ["Bunnie's Takeout", "Xavier brought back your favourite food from Bunnie's."],
@@ -723,13 +725,13 @@ h1{
   ["Childhood deets", "You sit with Jeremiah eating pastries as he tells childhood tales of Philos's Prince, both of you ignoring Xavier's grumbling and mortification"],
   ["Lumiere's Beacon of Hope", "You've found the light that Linkon looks up to"],
   ["Lumiere's Shining Hour", "You've officially secured a moment with Linkon's brightest hero"],
-  ["Lumiere's Heroic Encounter", "The city's favourite hero has finally notiec you"],
-  ["Lumiere's Emergency Light", "Incase of diaster,please remain calm. Lumiere has arrived"],
+  ["Lumiere's Heroic Encounter", "The city's favourite hero has finally notice you"],
+  ["Lumiere's Emergency Light", "In case of disaster, please remain calm. Lumiere has arrived"],
   ["Lumiere's VIP pass", "You've officially been granted unlimited Lumiere privileges → Xavier disliked this result"],
   ["Lumiere's Number One Fan", "You've officially been chosen by Linkon's Favourite Hero. please ignore the suspiciously quiet man standing nearby"],
   ["Lumiere's Fan club", "Your membership has been approved. Xavier was not consulted"],
   ["Cloud Watching", "Xavier points out a cloud that apparently looks like a rabbit."],
-  ["Accidental Hand-Holding", "Neither of you were brave enough to acknowledge,but neither of you lets go of the warmth either."],
+  ["Accidental Hand-Holding", "Neither of you were brave enough to acknowledge, but neither of you lets go of the warmth either."],
   ["Good Morning greetings from your star", "You receive a sleepy morning greeting from Xavier."],
   ["Star Map", "Xavier shows you a constellation he likes."],
   ["Photo Booth", "Xavier reluctantly agrees to take silly photos with you."],
@@ -741,7 +743,7 @@ h1{
   ["Bunnie's Hotpot Seat", "You have officially secured a seat beside Xavier."],
   ["Starry Night Drive", "Xavier drives while you watch the night sky."],
   ["Lucky Star", "Xavier points at a star and tells you to make a wish."],
-  ["Birthday Hug", "You surpirse a sleepy Xavier by waking him up with a birthday hug"],
+  ["Birthday Hug", "You surprise a sleepy Xavier by waking him up with a birthday hug"],
   ["The Star Tassel", "Do you remember the star you gave me? I've carried it for a very long time. Through every journey. Every battlefield. Every place I wasn't supposed to survive. I suppose I was afraid that if I ever let it go, I might forget who I was trying to return to."],
   ["The Returned Traveller", "Even if I have to cross another two hundred years, I'll find my way back to you"],
   ["The Grandis Knight", "When we meet again, I shall be Your Majesty's knight."]
@@ -753,21 +755,18 @@ const BLN_POOL = [
   ["So Close", "You almost had Xavier."],
   ["Not This Time", "Even Xavier can't win them all."],
   ["Try Again", "The stars weren't aligned this round."],
-  ["Almost there", "Missed by few light years"]
+  ["Almost there", "Missed by a few light years"]
 ];
 
 /* ==========================================================================
    2. CONTENT — R / SR / SSR card pools
    --------------------------------------------------------------------------
-   Each entry is { title, img }. `img` is a relative path — keep the
+   Each entry is [title, img]. `img` is a relative path — keep the
    /cards/ folder structure next to this HTML file when you upload it
    anywhere, or the images won't load.
-
-   R (4★) is EMPTY right now — drop your 30 images into /cards/r/ and
-   add one line per card below, following the same pattern as SR/SSR.
    ========================================================================== */
 
-  const R_POOL = [
+const R_POOL = [
   ["A Captured Moment", "cards/r/Xavier_A_Captured_Moment_middle.png"],
   ["A Day Of Snow", "cards/r/Xavier_A_Day_Of_Snow_middle.png"],
   ["An Appointment", "cards/r/Xavier_An_Appointment_middle.png"],
@@ -855,11 +854,11 @@ const SSR_POOL = [
 const SECRET_POOL = [
   ["Being a Good Girl for Xavier", "Xavier loves it when you are trapped under his body, pliant as he worships you from head to toe with his hands, tongue, lips, and even teeth. Your breath mingles with his for every heated kiss, and your nails dig into his skin, giving him both pain and pleasure."],
   ["A Rush of Adrenaline", "The battle is over, and Xavier teleports you two to an alley. You cling to him with your legs and arms wrapped around his body like vines while planting kisses to his jawline. He presses you against the wall, unable to wait any longer, and removes the dirty gloves to touch you."],
-  ["An Lazy Morning With Xavier", "You wake up to a sleepy Xavier nuzzling your neck while peppering sweet, gentle kisses to your skin. However, the innocent act of affection can't distract you from the hardness poking at your thigh. What a lovely way to start your day."],
-  ["A Very… Very Rough Night", "Pent up after weeks of being busy and having no time with each other, you and Xavier start making out when barely arriving at your home. Desperate hands cling to warm, needy bodies, pulling the one another flush against each other."],
-  ["Hunter's Association After Hours", "You have to stay back to work overtime one day, and Xavier offers to accompany you. But you didn't expect the overtime work would include this much kissing and a quickie in the heartquarters' bathroom."],
+  ["A Lazy Morning With Xavier", "You wake up to a sleepy Xavier nuzzling your neck while peppering sweet, gentle kisses to your skin. However, the innocent act of affection can't distract you from the hardness poking at your thigh. What a lovely way to start your day."],
+  ["A Very… Very Rough Night", "Pent up after weeks of being busy and having no time with each other, you and Xavier start making out when barely arriving at your home. Desperate hands cling to warm, needy bodies, pulling one another flush against each other."],
+  ["Hunter's Association After Hours", "You have to stay back to work overtime one day, and Xavier offers to accompany you. But you didn't expect the overtime work would include this much kissing and a quickie in the headquarters' bathroom."],
   ["Stress Relief", "Xavier has noticed how stressed you have been recently due to heavy workload and decided that he can be your stress relief toy. After all, this collar looks so pretty on him, and he can't wait to serve his beloved."],
-  ["Jealousy Goes Both Ways", "Xavier knows he gets jealous easily. But he feels a bit unwanted when you always act nonchalant even when he baits you to get jealous . So one can only imagine his surprise when you drag him home from a short interaction with a stranger, right before he gets pinned down and marked as yours."]
+  ["Jealousy Goes Both Ways", "Xavier knows he gets jealous easily. But he feels a bit unwanted when you always act nonchalant even when he baits you to get jealous. So one can only imagine his surprise when you drag him home from a short interaction with a stranger, right before he gets pinned down and marked as yours."]
 ];
 
 
@@ -947,8 +946,6 @@ const SSR_CHUNKS = [
 const SSR_LAYOUT = layoutChunks(seededShuffle(SSR_CHUNKS, 950613), 950);
 
 // --- Secret tier: 990–999, guaranteed, no Better Luck slice -------------
-// (10 numbers is too small to express any % below 10% cleanly — see the
-// earlier conversation. Left at 0% here; change if you want otherwise.)
 
 
 /* ==========================================================================
@@ -1065,7 +1062,7 @@ function getLimitData(){
   catch(e){ data = { count: 0, lockUntil: null }; }
   if(data.lockUntil && Date.now() >= data.lockUntil){
     data = { count: 0, lockUntil: null };
-    localStorage.setItem(LIMIT_KEY, JSON.stringify(data));
+    try { localStorage.setItem(LIMIT_KEY, JSON.stringify(data)); } catch(e){}
   }
   return data;
 }
@@ -1077,13 +1074,20 @@ function formatTimeLeft(ms){
   return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
 }
 
+function pullsLeftText(n){
+  return `${n} ${n === 1 ? "PULL" : "PULLS"} LEFT`;
+}
+
 function applyLimitState(){
   const data = getLimitData();
+  const pullsLeftEl = document.getElementById("pullsLeft");
   if(data.lockUntil && Date.now() < data.lockUntil){
     pullButton.disabled = true;
     statusEl.textContent = `COME BACK IN ${formatTimeLeft(data.lockUntil - Date.now())}`;
+    if(pullsLeftEl) pullsLeftEl.textContent = "0 PULLS LEFT";
     return false;
   }
+  if(pullsLeftEl) pullsLeftEl.textContent = pullsLeftText(MAX_PULLS - data.count);
   return true;
 }
 
@@ -1091,7 +1095,7 @@ function registerPull(){
   const data = getLimitData();
   data.count += 1;
   if(data.count >= MAX_PULLS) data.lockUntil = Date.now() + COOLDOWN_MS;
-  localStorage.setItem(LIMIT_KEY, JSON.stringify(data));
+  try { localStorage.setItem(LIMIT_KEY, JSON.stringify(data)); } catch(e){}
 }
 
 
@@ -1104,6 +1108,7 @@ const REEL_LOCK_DELAYS_MS = [900, 1200, 1500];
 function startPull(){
   if(!applyLimitState()) return;
   registerPull();
+  document.getElementById("pullsLeft").textContent = pullsLeftText(Math.max(0, MAX_PULLS - getLimitData().count));
   hasPulled = true;
   pullButton.disabled = true;
   statusEl.textContent = "CALCULATING...";
@@ -1173,12 +1178,12 @@ function revealCard(r){
   cardArtEl.alt = r.title;
   cardTitleEl.textContent = r.title;
   if(r.myth){
-  cardRarityMarkEl.innerHTML = '<div class="card-myth-badge">✦ MYTH ✦</div>';
-} else if(r.stars === 4){
-  cardRarityMarkEl.innerHTML = '<div class="card-planets">' + '<svg class="planet-icon"><use href="#planet-mark"></use></svg>'.repeat(4) + '</div>';
-} else {
-  cardRarityMarkEl.innerHTML = '<div class="card-stars-3d">' + '<svg class="star3d-icon"><use href="#star3d-mark"></use></svg>'.repeat(r.stars) + '</div>';
-}
+    cardRarityMarkEl.innerHTML = '<div class="card-myth-badge">✦ MYTH ✦</div>';
+  } else if(r.stars === 4){
+    cardRarityMarkEl.innerHTML = '<div class="card-planets">' + '<svg class="planet-icon"><use href="#planet-mark"></use></svg>'.repeat(4) + '</div>';
+  } else {
+    cardRarityMarkEl.innerHTML = '<div class="card-stars-3d">' + '<svg class="star3d-icon"><use href="#star3d-mark"></use></svg>'.repeat(r.stars) + '</div>';
+  }
   cardResult.classList.add("out");
   revealTimers.push(setTimeout(() => cardResult.classList.add("glow"), 250));
 }
@@ -1361,7 +1366,8 @@ function saveLetterAsImage(){
 
 function saveCardImage(){
   const link = document.createElement("a");
-  link.download = (currentResult.title || "xavier-card").replace(/\s+/g, "-") + ".webp";
+  const ext = (cardArtEl.src.split(".").pop().split("?")[0] || "png");
+  link.download = (currentResult.title || "xavier-card").replace(/\s+/g, "-") + "." + ext;
   link.href = cardArtEl.src;
   document.body.appendChild(link); link.click(); document.body.removeChild(link);
 }
@@ -1385,7 +1391,7 @@ function resetMachine(){
   cardResult.classList.remove("out", "glow");
   particleBurst.classList.remove("show");
   particleBurst.innerHTML = "";
-  
+
   window.scrollTo({ top: 0, behavior: "smooth" });
   if(applyLimitState()){
     pullButton.disabled = false;
