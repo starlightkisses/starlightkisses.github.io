@@ -177,7 +177,7 @@
 
 
   /* pencil button: only shown on notes written on this device */
-    .edit-btn {
+  .edit-btn {
     position: absolute;
     top: 6px;
     right: 6px;
@@ -293,7 +293,7 @@
   #editPanel.doodle-mode #editWarn,
   #editPanel.doodle-mode #editSave { display: none !important; }
 
-    /* constellation view: the wall as a night sky */
+  /* constellation view: the wall as a night sky */
   #sky {
     position: fixed; inset: 0; z-index: 180; display: none; overflow: hidden;
     background:
@@ -401,7 +401,33 @@
   }
   #sky .tool-btn { background: rgba(255,255,255,0.1); border-color: rgba(255,200,120,0.4); color: #ffeccd; }
   #sky .tool-btn:hover { background: rgba(255,200,120,0.2); }
-    /* ---- WOW upgrade for the night sky ---- */
+    /* full glowing moon in the night sky */
+  #skyMoon {
+    position: absolute; top: 96px; right: 16px; z-index: 0; pointer-events: none;
+    width: clamp(54px, 15vw, 96px); aspect-ratio: 1; border-radius: 50%;
+    background: radial-gradient(circle at 36% 32%, #fffdf0 0%, #fff0c4 38%, #f3d98f 72%, #e2bc66 100%);
+    box-shadow: 0 0 26px 6px rgba(255,236,170,0.55), 0 0 80px 24px rgba(255,214,120,0.26), 0 0 170px 60px rgba(167,139,250,0.14);
+    animation: moon-breathe 7s ease-in-out infinite alternate;
+  }
+  #skyMoon::before {
+    content: ""; position: absolute; inset: 0; border-radius: 50%;
+    background:
+      radial-gradient(circle at 62% 30%, rgba(214,178,100,0.42) 0 9%, transparent 10%),
+      radial-gradient(circle at 34% 58%, rgba(214,178,100,0.36) 0 13%, transparent 14%),
+      radial-gradient(circle at 70% 68%, rgba(214,178,100,0.32) 0 7%, transparent 8%),
+      radial-gradient(circle at 24% 28%, rgba(214,178,100,0.28) 0 5%, transparent 6%),
+      radial-gradient(circle at 52% 82%, rgba(214,178,100,0.26) 0 6%, transparent 7%);
+  }
+  #skyMoon::after {
+    content: ""; position: absolute; inset: 0; border-radius: 50%;
+    background: radial-gradient(circle at 72% 78%, rgba(120,90,170,0.22), transparent 62%);
+  }
+  @keyframes moon-breathe {
+    from { box-shadow: 0 0 22px 4px rgba(255,236,170,0.45), 0 0 70px 18px rgba(255,214,120,0.20), 0 0 150px 50px rgba(167,139,250,0.10); }
+    to   { box-shadow: 0 0 34px 9px rgba(255,236,170,0.68), 0 0 100px 32px rgba(255,214,120,0.34), 0 0 190px 70px rgba(167,139,250,0.18); }
+  }
+  .calm #skyMoon { animation: none; }
+  /* ---- WOW upgrade for the night sky ---- */
   @keyframes hub-halo {
     from { box-shadow: 0 0 0 8px rgba(255,184,56,0.12), 0 0 40px rgba(255,184,56,0.35); }
     to   { box-shadow: 0 0 0 14px rgba(255,184,56,0.22), 0 0 90px rgba(255,184,56,0.65); }
@@ -456,8 +482,63 @@
   }
   .calm .dust { display: none; }
   .calm #skyHub, .calm .sky-star, .calm .sky-star::after, .calm #skyLines path { animation: none !important; }
-    
-
+  /* ===== WOW SKY upgrade (only touches the night sky, not the pastel wall) ===== */
+  #skyCosmos {
+    position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
+    transform: translate(var(--px, 0px), var(--py, 0px)) scale(1.04);
+    transition: transform 0.6s ease-out;
+  }
+  #skyAurora {
+    position: absolute; left: -10%; right: -10%; top: -6%; height: 60%; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(60% 55% at 20% 30%, rgba(80,255,200,0.20), transparent 70%),
+      radial-gradient(55% 50% at 55% 20%, rgba(150,120,255,0.26), transparent 70%),
+      radial-gradient(50% 55% at 85% 35%, rgba(255,120,200,0.20), transparent 70%);
+    filter: blur(34px);
+    mix-blend-mode: screen;
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 0%, transparent 100%);
+    animation: aurora-wave 14s ease-in-out infinite alternate;
+  }
+  @keyframes aurora-wave {
+    0%   { transform: translateX(-4%) skewX(-6deg) scaleY(0.9); opacity: 0.7; }
+    100% { transform: translateX(4%) skewX(6deg) scaleY(1.15); opacity: 1; }
+  }
+  #skyPlanet {
+    position: absolute; left: 4%; bottom: 14%; z-index: 0; pointer-events: none;
+    width: clamp(46px, 11vw, 84px); aspect-ratio: 1; border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, #ffe9f3 0%, #f3a6cf 38%, #9a63c9 75%, #4b2f86 100%);
+    box-shadow: inset -10px -8px 18px rgba(20,10,60,0.55), 0 0 40px rgba(236,120,190,0.35);
+  }
+  #skyPlanet::before {
+    content: ""; position: absolute; left: -55%; right: -55%; top: 38%; height: 24%;
+    border-radius: 50%; border: 3px solid rgba(255,225,240,0.55);
+    transform: rotate(-18deg); box-shadow: 0 0 14px rgba(255,200,230,0.4);
+  }
+  #skyOrbit { position: absolute; width: 0; height: 0; z-index: 1; pointer-events: none; }
+  #skyOrbit i {
+    position: absolute; left: 50%; top: 50%; border-radius: 50%;
+    border: 1px dashed rgba(255,214,140,0.28); transform: translate(-50%, -50%);
+  }
+  #skyOrbit i::after {
+    content: ""; position: absolute; top: -3px; left: 50%; width: 6px; height: 6px; margin-left: -3px;
+    border-radius: 50%; background: #fff1d6; box-shadow: 0 0 10px 3px rgba(255,200,110,0.85);
+  }
+  #skyOrbit .o1 { width: 140px; height: 140px; animation: orbit-spin 24s linear infinite; }
+  #skyOrbit .o2 { width: 200px; height: 200px; border-color: rgba(200,170,255,0.25); animation: orbit-spin 38s linear infinite reverse; }
+  @keyframes orbit-spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+  .shooting-star {
+    width: 190px; height: 2.5px;
+    background: linear-gradient(90deg, rgba(255,214,140,0), rgba(255,241,214,0.9) 80%, #fff);
+    box-shadow: 0 0 10px 2px rgba(255,230,170,0.7);
+    animation: shoot-long 1.7s ease-out forwards;
+  }
+  @keyframes shoot-long {
+    0%   { opacity: 0; transform: translate(0, 0) rotate(28deg); }
+    12%  { opacity: 1; }
+    100% { opacity: 0; transform: translate(560px, 300px) rotate(28deg); }
+  }
+  .calm #skyAurora, .calm #skyOrbit i { animation: none; }
   /* the wall */
   #wall-scroll {
     position: relative;
@@ -651,6 +732,7 @@
       box-shadow: 0 6px 16px rgba(150,130,170,0.22), 0 1px 0 rgba(255,255,255,0.6) inset;
     }
   }
+
   /* softer, prettier glow for new notes and "find" */
   @keyframes note-glow {
     0%, 45% {
@@ -745,8 +827,8 @@
   }
 
   .cta-side:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(150,130,170,0.3); }
-  
-    @media (max-width: 560px) {
+
+  @media (max-width: 560px) {
     #cta-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -761,7 +843,7 @@
     .info-line { flex-direction: column; gap: 0; }
     .wish-count { font-size: 1.2rem; }
   }
-  
+
   /* modal */
   #overlay {
     position: fixed;
@@ -989,7 +1071,8 @@
     text-align: center;
   }
   #toast.ok { background: #8a76b8; }
-  /* welcome guide + ? button */
+
+  /* ============ welcome guide + ? button ============ */
   #helpBtn {
     position: fixed; top: 14px; right: 14px; z-index: 90;
     width: 38px; height: 38px; border-radius: 50%;
@@ -1011,79 +1094,182 @@
 
   #helpOverlay {
     position: fixed; inset: 0; z-index: 270; display: none;
-    align-items: center; justify-content: center; padding: 16px;
+    align-items: center; justify-content: center; padding: 14px;
     background:
-      radial-gradient(600px 400px at 20% 10%, rgba(185,166,224,0.35), transparent 70%),
-      rgba(40,32,70,0.55);
-    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+      radial-gradient(600px 420px at 18% 8%, rgba(167,139,250,0.40), transparent 70%),
+      radial-gradient(520px 400px at 90% 92%, rgba(244,143,177,0.28), transparent 70%),
+      rgba(26,20,58,0.72);
+    backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px);
   }
   #helpOverlay.open { display: flex; animation: help-fade 0.35s ease both; }
   @keyframes help-fade { from { opacity: 0; } }
 
   #helpCard {
-    position: relative; width: 100%; max-width: 440px; max-height: min(86vh, 720px);
+    position: relative; width: 100%; max-width: 460px; max-height: min(90vh, 760px);
     display: flex; flex-direction: column; overflow: hidden;
-    background: linear-gradient(180deg, #fffdfa 0%, #fbf4ea 100%);
-    border: 1px solid rgba(203,185,142,0.7); border-radius: 20px;
-    box-shadow: 0 0 0 6px rgba(203,185,142,0.14), 0 30px 80px rgba(60,40,100,0.4), 0 0 60px rgba(232,163,23,0.18);
-    animation: help-rise 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.1) both;
+    border: 2px solid transparent; border-radius: 24px;
+    background:
+      linear-gradient(180deg, #fffdfa 0%, #fbf3e8 100%) padding-box,
+      linear-gradient(140deg, #f5d27a, #c3aee5 38%, #f4a9c0 66%, #f5d27a) border-box;
+    box-shadow: 0 0 0 5px rgba(245,210,122,0.16), 0 30px 90px rgba(40,25,90,0.55), 0 0 80px rgba(245,190,90,0.28);
+    animation: help-rise 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.1) both, help-glow 5s ease-in-out 0.6s infinite alternate;
   }
-  @keyframes help-rise { from { opacity: 0; transform: translateY(24px) scale(0.96); } }
+  @keyframes help-rise { from { opacity: 0; transform: translateY(26px) scale(0.95); } }
+  @keyframes help-glow {
+    from { box-shadow: 0 0 0 5px rgba(245,210,122,0.14), 0 30px 90px rgba(40,25,90,0.55), 0 0 50px rgba(245,190,90,0.20); }
+    to   { box-shadow: 0 0 0 8px rgba(245,210,122,0.24), 0 30px 90px rgba(40,25,90,0.55), 0 0 100px rgba(245,190,90,0.42); }
+  }
 
+  /* floating sparkles inside the card */
+  #helpSparks { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+  .hs {
+    position: absolute; bottom: -12px; opacity: 0;
+    width: var(--sz, 6px); height: var(--sz, 6px);
+    background: radial-gradient(circle, #fff6d8 0%, #ffd27a 45%, rgba(255,210,122,0) 72%);
+    border-radius: 50%;
+    animation: hs-rise linear infinite;
+    animation-duration: var(--du, 9s); animation-delay: var(--dl, 0s);
+  }
+  @keyframes hs-rise {
+    0%   { opacity: 0; transform: translate(0, 0) scale(0.6); }
+    15%  { opacity: 0.95; }
+    85%  { opacity: 0.7; }
+    100% { opacity: 0; transform: translate(var(--dx, 14px), -70vh) scale(1.2); }
+  }
+
+  #helpHead {
+    position: relative; z-index: 2; flex: none; text-align: center;
+    padding: 20px 44px 14px;
+    background:
+      radial-gradient(260px 120px at 20% 0%, rgba(255,226,150,0.55), transparent 70%),
+      radial-gradient(240px 120px at 90% 10%, rgba(196,170,240,0.45), transparent 70%),
+      linear-gradient(180deg, #f7ecff 0%, #fbf3e8 100%);
+    border-bottom: 1px solid rgba(203,185,142,0.45);
+  }
+  #helpHead h2 {
+    margin: 0; white-space: nowrap;
+    font-family: 'Cormorant Garamond', serif; font-weight: 600; font-style: italic;
+    font-size: clamp(0.95rem, 4.6vw, 1.7rem); line-height: 1.2;
+    background: linear-gradient(100deg, #b8832a 0%, #f1c15d 22%, #fff1c2 40%, #e0a93b 58%, #a77bd6 80%, #b8832a 100%);
+    background-size: 220% 100%;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    filter: drop-shadow(0 0 8px rgba(245,190,90,0.45));
+    animation: help-shimmer 5s linear infinite;
+  }
+  @keyframes help-shimmer { from { background-position: 0% 0; } to { background-position: -220% 0; } }
+  .help-tag {
+    margin: 6px 0 0; font-family: 'Cormorant Garamond', serif; font-style: italic;
+    color: #8f74c8; font-size: 1.02rem; line-height: 1.35;
+  }
   #helpClose {
-    position: absolute; top: 10px; right: 12px; z-index: 2;
+    position: absolute; top: 12px; right: 12px; z-index: 3;
     width: 30px; height: 30px; border-radius: 50%; padding: 0;
     display: flex; align-items: center; justify-content: center;
-    background: rgba(255,255,255,0.8); border: 1px solid rgba(203,185,142,0.55);
-    color: #a68a52; font-size: 15px; line-height: 1; cursor: pointer;
+    background: rgba(255,255,255,0.85); border: 1px solid rgba(203,185,142,0.6);
+    color: #a68a52; font-size: 14px; line-height: 1; cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease;
   }
-  #helpClose:hover { background: #fff; }
+  #helpClose:hover { background: #fff; transform: rotate(90deg); }
 
   #helpScroll {
-    overflow-y: auto; padding: 30px 26px 8px; -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin; scrollbar-color: rgba(203,185,142,0.8) transparent;
+    position: relative; z-index: 1; flex: 1 1 auto; min-height: 0;
+    overflow-y: auto; padding: 16px 18px 6px; -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin; scrollbar-color: rgba(203,185,142,0.85) transparent;
   }
   #helpScroll::-webkit-scrollbar { width: 6px; }
-  #helpScroll::-webkit-scrollbar-thumb { background: rgba(203,185,142,0.8); border-radius: 6px; }
-  #helpScroll h2 {
-    font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 1.75rem;
-    text-align: center; margin: 0 0 6px; color: #4a4356;
+  #helpScroll::-webkit-scrollbar-thumb { background: rgba(203,185,142,0.85); border-radius: 6px; }
+  #helpScroll p { font-size: 0.9rem; line-height: 1.65; color: #5b5468; margin: 0 0 9px; }
+  #helpScroll strong { color: #3f3752; font-weight: 600; }
+  #helpScroll em { color: #754c9c; }
+  .help-intro { text-align: center; padding: 2px 6px 0; }
+
+  /* each section = a soft glowing panel */
+  .hsec {
+    position: relative; margin: 14px 0; padding: 14px 16px 8px;
+    background: linear-gradient(160deg, rgba(255,255,255,0.92), rgba(251,244,255,0.85));
+    border: 1px solid rgba(196,170,240,0.55); border-radius: 16px;
+    box-shadow: 0 6px 22px rgba(150,120,200,0.14), 0 0 0 1px rgba(255,255,255,0.7) inset;
   }
-  #helpScroll h2 em { color: #c9a36a; }
-  .help-tag {
-    text-align: center; font-family: 'Cormorant Garamond', serif; font-style: italic;
-    color: #a893d1; font-size: 1.05rem; margin: 0 0 6px;
+  .hsec h3 {
+    margin: 0 0 10px; display: flex; align-items: center; gap: 8px;
+    font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 1.28rem; line-height: 1.25;
+    color: #8a5fb8;
   }
-  .help-orn { text-align: center; color: #c9a36a; letter-spacing: 0.5em; font-size: 0.8rem; margin: 12px 0 16px; }
-  #helpScroll p { font-size: 0.9rem; line-height: 1.65; color: #5b5468; margin: 0 0 10px; }
-  #helpScroll h3 {
-    display: flex; align-items: center; gap: 8px; margin: 22px 0 6px;
-    font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 600; color: #754c9c;
+  .hsec h3 .gl { color: #e0a93b; text-shadow: 0 0 10px rgba(245,190,90,0.8); }
+  .hsec ul { margin: 0 0 9px; padding: 0; list-style: none; }
+  .hsec li { position: relative; padding-left: 20px; font-size: 0.9rem; line-height: 1.6; margin-bottom: 7px; color: #5b5468; }
+  .hsec li::before { content: "✧"; position: absolute; left: 1px; top: 0; color: #d6a84a; text-shadow: 0 0 8px rgba(245,190,90,0.7); }
+  .hsec .small { font-size: 0.8rem; line-height: 1.55; color: #a3486a; background: rgba(244,169,192,0.16); border-radius: 10px; padding: 7px 10px; margin: 6px 0 9px; }
+
+  /* little pill chips that look like the real buttons */
+  .chip {
+    display: inline-block; padding: 1px 10px; margin: 0 1px; border-radius: 999px;
+    font-size: 0.82rem; font-weight: 500; line-height: 1.6; white-space: nowrap; color: #4d3f72;
+    background: linear-gradient(160deg, #efe6fb, #d9c9f3);
+    border: 1px solid rgba(167,143,209,0.65);
+    box-shadow: 0 2px 6px rgba(120,95,165,0.2), 0 1px 0 rgba(255,255,255,0.8) inset;
   }
-  #helpScroll h3::before { content: "✦"; color: #e0a93b; font-size: 0.8rem; }
-  #helpScroll ul { margin: 0 0 10px; padding: 0; list-style: none; }
-  #helpScroll li { position: relative; padding-left: 18px; font-size: 0.9rem; line-height: 1.6; margin-bottom: 6px; color: #5b5468; }
-  #helpScroll li::before { content: "✧"; position: absolute; left: 0; color: #c9a36a; }
-  #helpScroll strong { color: #4a4356; font-weight: 600; }
+  .chip.heart { color: #b5546b; background: linear-gradient(160deg, #fff, #f7d6df); border-color: rgba(227,154,171,0.8); }
+
+  /* note + disclaimer + ko-fi boxes */
+  .hbox { position: relative; margin: 14px 0; padding: 12px 15px 5px; border-radius: 16px; border: 2px dashed; }
+  .hbox h4 { margin: 0 0 8px; font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 600; }
+  .hbox ul { margin: 0 0 7px; padding: 0; list-style: none; }
+  .hbox li { position: relative; padding-left: 18px; font-size: 0.88rem; line-height: 1.6; margin-bottom: 6px; color: #5b5468; }
+  .hbox li::before { content: "•"; position: absolute; left: 4px; color: #c9a36a; }
+  .hbox.cream  { background: linear-gradient(160deg, #fff9ec, #fbf0d8); border-color: rgba(224,169,59,0.65); }
+  .hbox.cream h4 { color: #a8741b; }
+  .hbox.purple { background: linear-gradient(160deg, #f6f0ff, #ece2fb); border-color: rgba(138,95,192,0.55); }
+  .hbox.purple h4 { color: #7a4fb0; }
+  .hbox.lav    { background: linear-gradient(160deg, #f3f0ff, #e6e0fa); border-color: rgba(120,105,200,0.5); }
+  .hbox.lav h4 { color: #5e55a8; }
+  .hbox.rose   { background: linear-gradient(160deg, #fff1f4, #fadde5); border-color: rgba(214,106,138,0.55); }
+  .hbox.rose h4 { color: #b5456b; }
+  .hbox.kofi   { background: linear-gradient(160deg, #fff8e6, #ffeec2); border-color: rgba(224,169,59,0.75); text-align: center; }
+  .hbox.kofi p { margin-bottom: 8px; }
+  .kofi-link {
+    display: inline-block; margin: 0 0 8px; padding: 8px 16px; border-radius: 999px;
+    font-weight: 600; font-size: 0.88rem; text-decoration: none; color: #5a3d0a;
+    background: linear-gradient(160deg, #ffe08a, #f5b83d);
+    box-shadow: 0 6px 16px rgba(224,169,59,0.45), 0 1px 0 rgba(255,255,255,0.7) inset;
+    transition: transform 0.15s ease;
+  }
+  .kofi-link:hover { transform: translateY(-2px); }
   .help-sign {
-    text-align: center; font-family: 'Cormorant Garamond', serif; font-style: italic;
-    color: #a893d1; margin: 22px 0 14px; font-size: 1rem;
+    text-align: center; font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 600;
+    color: #8f74c8; margin: 14px 0 8px; font-size: 1.05rem;
   }
-  #helpFoot { position: relative; padding: 14px 26px 20px; background: #fbf4ea; text-align: center; }
+
+  #helpFoot { position: relative; z-index: 2; flex: none; padding: 12px 22px 18px; background: #fbf3e8; text-align: center; }
   #helpFoot::before {
-    content: ""; position: absolute; left: 0; right: 0; top: -26px; height: 26px;
-    background: linear-gradient(180deg, rgba(251,244,234,0), #fbf4ea); pointer-events: none;
+    content: ""; position: absolute; left: 0; right: 0; top: -24px; height: 24px;
+    background: linear-gradient(180deg, rgba(251,243,232,0), #fbf3e8); pointer-events: none;
   }
   #helpGo {
+    position: relative; overflow: hidden;
     background: linear-gradient(160deg, #e3d5f7 0%, #c3aee5 45%, #a78fd1 100%);
-    color: #453c5c; border: 1px solid rgba(255,255,255,0.5);
-    padding: 12px 28px; border-radius: 999px;
-    font-family: 'Outfit', sans-serif; font-weight: 500; font-size: 0.92rem; cursor: pointer;
-    box-shadow: 0 8px 22px rgba(120,95,165,0.4), 0 2px 0 rgba(255,255,255,0.7) inset;
+    color: #453c5c; border: 1px solid rgba(255,255,255,0.55);
+    padding: 13px 34px; border-radius: 999px;
+    font-family: 'Outfit', sans-serif; font-weight: 500; font-size: 0.95rem; cursor: pointer;
+    box-shadow: 0 10px 26px rgba(120,95,165,0.45), 0 2px 0 rgba(255,255,255,0.7) inset;
+    animation: go-pulse 3s ease-in-out infinite;
     transition: transform 0.15s ease;
   }
   #helpGo:hover { transform: translateY(-2px); }
-  .calm #helpBtn, .calm #helpCard, .calm #helpOverlay.open { animation: none; }
+  @keyframes go-pulse {
+    0%, 100% { box-shadow: 0 10px 26px rgba(120,95,165,0.45), 0 2px 0 rgba(255,255,255,0.7) inset, 0 0 0 0 rgba(245,190,90,0); }
+    50%      { box-shadow: 0 10px 26px rgba(120,95,165,0.45), 0 2px 0 rgba(255,255,255,0.7) inset, 0 0 22px 5px rgba(245,190,90,0.5); }
+  }
+
+  /* sections fade up one by one as you scroll (only when the browser supports it) */
+  #helpCard.rv-on .rv { opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.3, 1); }
+  #helpCard.rv-on .rv.in { opacity: 1; transform: none; }
+
+  .calm #helpBtn, .calm #helpCard, .calm #helpOverlay.open, .calm #helpHead h2, .calm #helpGo { animation: none; }
+  .calm #helpHead h2 { filter: none; }
+  .calm .hs { display: none; }
+  .calm #helpCard.rv-on .rv { opacity: 1; transform: none; transition: none; }
   /* confetti */
   .confetti {
     position: fixed;
@@ -1112,7 +1298,7 @@
   <div id="star-field"></div>
 
 <header>
-  <div class="eyebrow">Designed & created by <strong>Ru</strong> (<a href="https://x.com/starlitbride_" target="_blank" rel="noopener" style="color: inherit; font-weight: 600; text-decoration: underline;">@starlitbride_</a>)</div>
+  <div class="eyebrow">Designed & created by  <strong>Ru</strong> (<a href="https://x.com/starlitbride_" target="_blank" rel="noopener" style="color: inherit; font-weight: 600; text-decoration: underline;">@starlitbride_</a>)</div>
   <h1>Wall of birthday wishes by Little Stars, <em>for Xavier</em></h1>
   <p class="sub">Leave a message and watch it find its place among the others. The wall keeps growing — as every single note stays.</p>
 
@@ -1129,7 +1315,7 @@
     <button class="tool-btn" id="shareBtn">Share</button>
     <button class="tool-btn" id="snapBtn">📷 Snapshot</button>
     <button class="tool-btn" id="constBtn" aria-pressed="false">✦ Constellation</button>
-    <button class="tool-btn" id="musicBtn" aria-pressed="false">🎵 Music</button>
+    
   </div>
 </header>
 
@@ -1248,64 +1434,98 @@
 </div>
 
 <div id="sky" aria-hidden="true">
+    <canvas id="skyCosmos"></canvas>
+  <div id="skyAurora"></div>
+  <div id="skyPlanet"></div>
+  <div id="skyOrbit"><i class="o1"></i><i class="o2"></i></div>
   <svg id="skyLines" xmlns="http://www.w3.org/2000/svg"></svg>
   <div id="skyHub"><img src="xavier-card.jpg" alt=""></div>
   <div id="skyStars"></div>
   <div id="skyTitle">Every wish is a star<span id="skySub">Tap a star to read its wish</span></div>
-    <div id="skyMist"></div>
+  <div id="skyMoon"></div>
+  <div id="skyMist"></div>
   <div id="skyTools">
     <button class="tool-btn" id="skyShare">Share</button>
     <button class="tool-btn" id="skySnap">📷 Snapshot</button>
     <button class="tool-btn" id="skyClose">← Back to the wall</button>
   </div>
 </div>
+
 <button id="helpBtn" type="button" aria-label="How this wall works">?</button>
 
 <div id="helpOverlay" aria-hidden="true">
   <div id="helpCard" role="dialog" aria-label="Welcome to the Wall of Stars">
-    <button id="helpClose" type="button" aria-label="Close">✕</button>
-    <div id="helpScroll">
-      <h2>✦ Welcome to the <em>Wall of Stars</em> ✦</h2>
+    <div id="helpSparks"></div>
+    <div id="helpHead">
+      <h2>✮⋆˙ Welcome to the Wall of Stars ❀★</h2>
       <p class="help-tag">A birthday gift for Xavier, wished up by Little Stars.</p>
-      <div class="help-orn">✦ ✦ ✦</div>
-
-      <p>Xavier's birthday is on <strong>16 October</strong>. This is a little corner of the sky where everyone can leave him a wish. Every note you pin stays on the wall, so it keeps growing brighter.</p>
-
-      <h3>Leave a wish</h3>
-      <p>Tap the big purple button at the bottom. Add your name, then choose how to say it:</p>
-      <ul>
-        <li><strong>Write</strong> a message of up to 180 characters, or</li>
-        <li><strong>Doodle</strong> it by drawing with your finger. You can change the color and thickness, and undo or clear.</li>
-      </ul>
-      <p>Then pick your note's size, tilt and color. A preview shows how it'll look. Tap <em>Pin it to the wall</em> and it will fly into place.</p>
-
-      <h3>Explore the wall</h3>
-      <ul>
-        <li><strong>Tap any note</strong> to read it bigger.</li>
-        <li><strong>Tap the ♡</strong> on a note to send it a heart. You get one heart per note.</li>
-        <li><strong>Find</strong> lets you type a name to jump straight to their wish.</li>
-        <li>On phones the wall is shrunk to fit. You can scroll sideways to see all of it.</li>
-      </ul>
-
-      <h3>Made a mistake?</h3>
-      <p>A small pencil appears on notes you wrote. Tap it to edit or delete your wish. The pencil only shows on the same device and browser you wrote it on. Doodles can't be edited, but you can delete one and draw a new one.</p>
-
-      <h3>Night sky</h3>
-      <p>Tap <strong>✦ Constellation</strong> to turn the wall into a starry sky. Every wish becomes a golden star, joined into a constellation around Xavier. Tap a star to read its wish.</p>
-
-      <h3>Keep or share it</h3>
-      <ul>
-        <li><strong>Share</strong> sends the link to a friend.</li>
-        <li><strong>Snapshot</strong> saves a picture of the whole wall. You can also take one of the night sky.</li>
-        <li><strong>Music</strong> plays soft spring sounds. It's off until you tap it.</li>
-      </ul>
-
-      <h3>Good to know</h3>
-      <p>The wall refreshes on its own, so new wishes appear as they're pinned. Please be kind, because a few words are filtered. You can reopen this guide anytime with the <strong>?</strong> button.</p>
-
-      <div class="help-orn">✦ ✦ ✦</div>
-      <p class="help-sign">Designed &amp; created by Ru (@starlitbride_) ♡</p>
+      <button id="helpClose" type="button" aria-label="Close">✕</button>
     </div>
+
+    <div id="helpScroll">
+      <p class="help-intro rv">This is a little corner of the sky where everyone can leave him a wish. Every note you pin stays on the wall, so it keeps growing <strong>bigger</strong></p>
+
+      <section class="hsec rv">
+        <h3><span class="gl">.✦ ݁˖</span> To leave a wish 💌</h3>
+        <p>Tap on the <span class="chip">"Leave a message for Xavier"</span> button at the bottom. You can opt to write a message or doodle or both.</p>
+        <ul>
+          <li><strong>Write</strong> a message of up to <strong>180 characters</strong>, or</li>
+          <li><strong>Doodle</strong> it by drawing with your finger. You can change the color and thickness, and undo or clear.</li>
+          <li>Then pick your note's <strong>size, tilt and color</strong>. A preview shows how it'll look.</li>
+        </ul>
+        <p>Add your name and tap <span class="chip">Pin it to the wall</span> and it will fly into place automatically ♡</p>
+      </section>
+
+      <div class="hbox cream rv">
+        <h4>📝 Note: incase of a mistake-</h4>
+        <ul>
+          <li>A small <strong>pencil icon</strong> appears on the notes you wrote. Tap it to <strong>edit or delete</strong> your wish.</li>
+          <li>The pencil only shows on the <strong>same device and browser</strong> you used to write the note. So if you open the wall on a different device or through a link on another browser, the pencil won't appear and you won't be able to change your note.</li>
+          <li><strong>Doodles can't be edited</strong>, but you can delete one and draw a new one.</li>
+        </ul>
+      </div>
+
+      <section class="hsec rv">
+        <h3><span class="gl">.✦ ݁˖</span> Explore the wall</h3>
+        <ul>
+          <li><strong>Read a wish:</strong> tap on it. It will get bigger.</li>
+          <li><strong>Send love:</strong> if you really like someone's wish tap the <span class="chip heart">♡</span> to send it a heart.
+            <div class="small">Disclaimer: the number of hearts has nothing to do with where a wish sits on the wall. Every wish is placed on the wall automatically.</div>
+          </li>
+          <li><strong>Find yours:</strong> to find your wish admist all, click on <span class="chip">Find</span> and search with the name you gave inside your wish</li>
+          <li><strong>Share:</strong> to share the link to a friend click on <span class="chip">Share</span> button</li>
+          <li><strong>Snapshot:</strong> and if you want a whole screenshot of all the love and wishes our prince is getting, click on <span class="chip">Snapshot</span> to a picture of the whole wall.</li>
+        </ul>
+      </section>
+
+      <section class="hsec rv">
+        <h3><span class="gl">.✦ ݁˖</span> Night sky 🌌</h3>
+        <p>Tap on <span class="chip">✦ Constellation</span> to turn the wall into a starry sky. Every wish you see on the wall, becomes a <strong>golden star</strong>, joining into a constellation around our Xavier. If you tap a star you can read its wish.</p>
+      </section>
+
+      <div class="hbox purple rv">
+        <h4>💜 Note</h4>
+        <p>You can reopen this guide anytime with the <strong>?</strong> button.</p>
+      </div>
+
+      <div class="hbox lav rv">
+        <h4>Disclaimer</h4>
+        <p>Before you start throwing around <strong>AI or plagiarism accusations</strong>, do remember that I have my code saved on Laptop, websites I used, time stamps as well as moots who can verify when I started this project. So don't try to start unnecessary false drama ♡</p>
+      </div>
+
+      <div class="hbox rose rv">
+        <h4>Disclaimer</h4>
+        <p>This is a <strong>birthday project for Xavier</strong>, so please keep it kind. If you don't have anything nice to say, kindly keep it to yourself. Do not make me scour your note and hunt you down ☺️</p>
+      </div>
+
+      <p class="help-sign rv">· Designed &amp; created by Ru (@starlitbride_) ♡</p>
+
+      <div class="hbox kofi rv">
+        <p>☕ If this made you smile, you can treat me to a little coffee on Ko-fi.</p>
+        <a class="kofi-link" href="https://ko-fi.com/starlitbride_" target="_blank" rel="noopener">☕ ko-fi.com/starlitbride_</a>
+      </div>
+    </div>
+
     <div id="helpFoot">
       <button id="helpGo" type="button">✦ Let's go</button>
     </div>
@@ -1784,7 +2004,7 @@ function drawWall(messages, opts = {}) {
       pencil.type = 'button';
       pencil.className = 'edit-btn';
       pencil.setAttribute('aria-label', 'Edit or delete your wish');
-            pencil.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 2.8 0l.2.2a2 2 0 0 1 0 2.8L8 19l-4 1z"/><path d="M14 7l3 3"/></svg>';
+      pencil.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 2.8 0l.2.2a2 2 0 0 1 0 2.8L8 19l-4 1z"/><path d="M14 7l3 3"/></svg>';
       el.appendChild(pencil);
     }
 
@@ -2770,24 +2990,39 @@ editDelete.addEventListener('click', () => {
 });
 
 /* ============================================================
-   SPRING MUSIC — made live in the browser (no audio file needed):
-   a soft pad, glass-bell chimes, little bird chirps and a breeze.
-   Starts only when the visitor taps the button.
+   STARRY-SKY MUSIC — made live in the browser (no audio file needed):
+   a slow cosmic pad, music-box star twinkles, tiny high sparkles and
+   a soft space wind, all floating in a big dreamy reverb.
+   It begins by itself on the visitor's first tap or key press
+   (browsers don't allow any sound before that).
    ============================================================ */
 
-const musicBtn = document.getElementById('musicBtn');
 let audio = null;
 let musicOn = false;
 let musicTimers = [];
 let chordIdx = 0;
 
-const PENTA = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];   // C D E G A C
+// D major pentatonic, played high like a music box
+const STAR_NOTES = [587.33, 659.25, 739.99, 880.00, 987.77, 1174.66, 1318.51, 1479.98];
+const SPARKLES = [2349.32, 2637.02, 2959.96, 3520.00];
 const CHORDS = [
-  [130.81, 261.63, 329.63, 392.00],   // C
-  [110.00, 261.63, 329.63, 440.00],   // Am
-  [87.31, 261.63, 349.23, 440.00],    // F
-  [98.00, 246.94, 293.66, 392.00]     // G
+  [73.42, 146.83, 220.00, 329.63, 369.99],    // Dmaj9
+  [123.47, 185.00, 220.00, 293.66, 369.99],   // Bm7
+  [98.00, 146.83, 246.94, 293.66, 369.99],    // Gmaj7
+  [110.00, 164.81, 220.00, 246.94, 329.63]    // Asus2
 ];
+
+function makeReverb(ctx, secs, decay) {
+  const len = Math.floor(ctx.sampleRate * secs);
+  const imp = ctx.createBuffer(2, len, ctx.sampleRate);
+  for (let ch = 0; ch < 2; ch++) {
+    const d = imp.getChannelData(ch);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+  }
+  const conv = ctx.createConvolver();
+  conv.buffer = imp;
+  return conv;
+}
 
 function buildAudio() {
   const Ctx = window.AudioContext || window.webkitAudioContext;
@@ -2798,31 +3033,42 @@ function buildAudio() {
   master.gain.value = 0;
   const soften = ctx.createBiquadFilter();
   soften.type = 'lowpass';
-  soften.frequency.value = 5200;
+  soften.frequency.value = 6500;
   master.connect(soften);
   soften.connect(ctx.destination);
 
-  // bus for chimes and chirps, with a soft echo
+  // one big dreamy reverb shared by everything
+  const reverb = makeReverb(ctx, 5, 2.4);
+  const reverbOut = ctx.createGain();
+  reverbOut.gain.value = 0.85;
+  reverb.connect(reverbOut);
+  reverbOut.connect(master);
+
+  // bus for the twinkles: dry + long echo + reverb
   const bus = ctx.createGain();
   bus.gain.value = 1;
   bus.connect(master);
-  const echo = ctx.createDelay(1.5);
-  echo.delayTime.value = 0.38;
+  bus.connect(reverb);
+  const echo = ctx.createDelay(2);
+  echo.delayTime.value = 0.52;
   const feedback = ctx.createGain();
-  feedback.gain.value = 0.35;
+  feedback.gain.value = 0.4;
   const wet = ctx.createGain();
-  wet.gain.value = 0.5;
+  wet.gain.value = 0.45;
   bus.connect(echo);
   echo.connect(feedback);
   feedback.connect(echo);
   echo.connect(wet);
   wet.connect(master);
+  wet.connect(reverb);
 
+  // pad bus
   const pad = ctx.createGain();
   pad.gain.value = 1;
   pad.connect(master);
+  pad.connect(reverb);
 
-  // breeze: quiet filtered noise that slowly swells
+  // space wind: quiet filtered noise whose colour slowly drifts
   const buf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
   const d = buf.getChannelData(0);
   for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
@@ -2831,81 +3077,98 @@ function buildAudio() {
   noise.loop = true;
   const band = ctx.createBiquadFilter();
   band.type = 'bandpass';
-  band.frequency.value = 600;
-  band.Q.value = 0.5;
-  const breeze = ctx.createGain();
-  breeze.gain.value = 0.02;
+  band.frequency.value = 450;
+  band.Q.value = 0.6;
+  const wind = ctx.createGain();
+  wind.gain.value = 0.018;
   const lfo = ctx.createOscillator();
-  lfo.frequency.value = 0.09;
+  lfo.frequency.value = 0.07;
   const lfoDepth = ctx.createGain();
-  lfoDepth.gain.value = 0.015;
+  lfoDepth.gain.value = 0.012;
   lfo.connect(lfoDepth);
-  lfoDepth.connect(breeze.gain);
+  lfoDepth.connect(wind.gain);
+  const lfo2 = ctx.createOscillator();
+  lfo2.frequency.value = 0.05;
+  const lfo2Depth = ctx.createGain();
+  lfo2Depth.gain.value = 220;
+  lfo2.connect(lfo2Depth);
+  lfo2Depth.connect(band.frequency);
   noise.connect(band);
-  band.connect(breeze);
-  breeze.connect(master);
+  band.connect(wind);
+  wind.connect(master);
+  wind.connect(reverb);
   noise.start();
   lfo.start();
+  lfo2.start();
 
   return { ctx, master, bus, pad };
 }
 
+// a slow glowing chord: every note is two softly detuned sines
 function playChord(freqs) {
-  const c = audio.ctx, t = c.currentTime, life = 10;
+  const c = audio.ctx, t = c.currentTime, life = 9;
   freqs.forEach((f, i) => {
-    const o = c.createOscillator();
-    const g = c.createGain();
-    o.type = 'sine';
-    o.frequency.value = f;
-    o.detune.value = i % 2 ? 4 : -4;
-    g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(0.05, t + 3);
-    g.gain.linearRampToValueAtTime(0, t + life + 3);
-    o.connect(g);
-    g.connect(audio.pad);
-    o.start(t);
-    o.stop(t + life + 3.1);
+    [-6, 6].forEach(det => {
+      const o = c.createOscillator();
+      const g = c.createGain();
+      o.type = 'sine';
+      o.frequency.value = f;
+      o.detune.value = det;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(i === 0 ? 0.045 : 0.03, t + 4);
+      g.gain.linearRampToValueAtTime(0, t + life + 4);
+      o.connect(g);
+      g.connect(audio.pad);
+      o.start(t);
+      o.stop(t + life + 4.1);
+    });
   });
 }
 
-function chime() {
-  const c = audio.ctx, t = c.currentTime;
-  const f = PENTA[Math.floor(Math.random() * PENTA.length)];
-  [[1, 0.09], [2, 0.03]].forEach(([mult, vol]) => {
+// one music-box / glass-bell note
+function bell(f, when, vol, pan) {
+  const c = audio.ctx;
+  const out = c.createGain();
+  if (c.createStereoPanner) {
+    const p = c.createStereoPanner();
+    p.pan.value = pan;
+    out.connect(p);
+    p.connect(audio.bus);
+  } else {
+    out.connect(audio.bus);
+  }
+  [[1, 1, 3.6], [2, 0.3, 2.2], [3.01, 0.12, 1.2]].forEach(([mult, amp, dur]) => {
     const o = c.createOscillator();
     const g = c.createGain();
     o.type = 'sine';
     o.frequency.value = f * mult;
-    g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(vol, t + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + 2.8);
+    g.gain.setValueAtTime(0, when);
+    g.gain.linearRampToValueAtTime(vol * amp, when + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, when + dur);
     o.connect(g);
-    g.connect(audio.bus);
-    o.start(t);
-    o.stop(t + 2.9);
+    g.connect(out);
+    o.start(when);
+    o.stop(when + dur + 0.1);
   });
 }
 
-function chirp() {
-  const c = audio.ctx;
-  let t = c.currentTime + 0.05;
-  const n = 2 + Math.floor(Math.random() * 3);
-  const base = 2200 + Math.random() * 1200;
-  for (let i = 0; i < n; i++) {
-    const o = c.createOscillator();
-    const g = c.createGain();
-    o.type = 'sine';
-    o.frequency.setValueAtTime(base, t);
-    o.frequency.exponentialRampToValueAtTime(base * 1.5, t + 0.07);
-    g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(0.03, t + 0.015);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
-    o.connect(g);
-    g.connect(audio.bus);
-    o.start(t);
-    o.stop(t + 0.1);
-    t += 0.12 + Math.random() * 0.05;
+// a little lullaby run of 3–5 notes, climbing or falling
+function twinkleRun() {
+  const t = audio.ctx.currentTime + 0.05;
+  const n = 3 + Math.floor(Math.random() * 3);
+  const start = Math.floor(Math.random() * STAR_NOTES.length);
+  const dir = Math.random() < 0.5 ? 1 : -1;
+  const pan = (Math.random() - 0.5) * 1.2;
+  for (let k = 0; k < n; k++) {
+    const idx = Math.min(STAR_NOTES.length - 1, Math.max(0, start + dir * k));
+    bell(STAR_NOTES[idx], t + k * (0.5 + Math.random() * 0.12), 0.07, pan);
   }
+}
+
+// a single very high, very quiet star-glint
+function sparkle() {
+  const f = SPARKLES[Math.floor(Math.random() * SPARKLES.length)];
+  bell(f, audio.ctx.currentTime + 0.05, 0.022, (Math.random() - 0.5) * 1.8);
 }
 
 function musicLoop(fn, minMs, maxMs) {
@@ -2917,38 +3180,32 @@ function musicLoop(fn, minMs, maxMs) {
 }
 
 function startMusic() {
+  if (musicOn) { if (audio) audio.ctx.resume(); return; }
   if (!audio) audio = buildAudio();
-  if (!audio) { showToast("This browser can't play the music."); return; }
+  if (!audio) return;
   audio.ctx.resume();
   audio.master.gain.cancelScheduledValues(audio.ctx.currentTime);
-  audio.master.gain.setTargetAtTime(0.5, audio.ctx.currentTime, 0.6);
+  audio.master.gain.setTargetAtTime(0.55, audio.ctx.currentTime, 2.5);   // fades in gently
   musicOn = true;
-  musicBtn.classList.add('on');
-  musicBtn.setAttribute('aria-pressed', 'true');
-  musicBtn.textContent = '🎵 Music on';
 
   playChord(CHORDS[chordIdx++ % CHORDS.length]);
   musicTimers.push(setInterval(() => {
     if (!document.hidden) playChord(CHORDS[chordIdx++ % CHORDS.length]);
-  }, 10000));
-  musicLoop(chime, 1400, 3800);
-  musicLoop(chirp, 4500, 10000);
+  }, 9000));
+  musicLoop(twinkleRun, 3500, 8000);
+  musicLoop(sparkle, 1500, 4000);
 }
 
-function stopMusic() {
-  musicOn = false;
-  musicTimers.forEach(id => { clearTimeout(id); clearInterval(id); });
-  musicTimers = [];
-  musicBtn.classList.remove('on');
-  musicBtn.setAttribute('aria-pressed', 'false');
-  musicBtn.textContent = '🎵 Music';
-  if (!audio) return;
-  audio.master.gain.cancelScheduledValues(audio.ctx.currentTime);
-  audio.master.gain.setTargetAtTime(0, audio.ctx.currentTime, 0.25);
-  setTimeout(() => { if (!musicOn) audio.ctx.suspend(); }, 1200);
+// no button: the music begins on the visitor's first tap / click / key press
+const MUSIC_START_EVENTS = ['pointerdown', 'touchend', 'click', 'keydown'];
+function firstTouchMusic() {
+  startMusic();
+  if (!audio) { MUSIC_START_EVENTS.forEach(e => document.removeEventListener(e, firstTouchMusic, true)); return; }
+  audio.ctx.resume().then(() => {
+    if (audio.ctx.state === 'running') MUSIC_START_EVENTS.forEach(e => document.removeEventListener(e, firstTouchMusic, true));
+  });
 }
-
-musicBtn.addEventListener('click', () => { musicOn ? stopMusic() : startMusic(); });
+MUSIC_START_EVENTS.forEach(e => document.addEventListener(e, firstTouchMusic, true));
 
 // pause the sound while the tab is hidden, and bring it back afterwards
 document.addEventListener('visibilitychange', () => {
@@ -2993,7 +3250,7 @@ function buildSky() {
     const r = 0.16 + 0.84 * Math.sqrt((i + 0.5) / n);
     const a = i * 2.399963 + wobble(i, 3) * 0.7;
     const j = 1 + (wobble(i, 7) - 0.5) * 0.2;
-        let x = cx + Math.cos(a) * r * rx * j, y = cy + Math.sin(a) * r * ry * j;
+    let x = cx + Math.cos(a) * r * rx * j, y = cy + Math.sin(a) * r * ry * j;
     const dx = x - cx, dy = y - cy, dist = Math.hypot(dx, dy), minD = 86;
     if (dist < minD) {
       const f = minD / (dist || 1);
@@ -3050,7 +3307,7 @@ function buildSky() {
     b.style.setProperty('--in', (0.15 + Math.min(i * 0.12, 3)) + 's');
     b.title = '— ' + p.m.name;
     b.setAttribute('aria-label', 'Wish from ' + p.m.name);
-    const size = 14 + Math.min(Number(p.m.hearts) || 0, 10) * 1.6;   // hearted wishes shine bigger
+    const size = 20 + Math.min(Number(p.m.hearts) || 0, 10) * 2;
     const shape = document.createElement('span');
     shape.className = 'sky-star-shape';
     shape.style.width = size + 'px';
@@ -3131,10 +3388,12 @@ async function saveSkySnapshot() {
       ctx.fill();
     }
 
+        if (cosmosBg) ctx.drawImage(cosmos, 0, 0, W, H);   // the cosmos behind the stars
+
     // constellation lines
     const lp = skyLines.querySelector('path');
     if (lp) {
-            ctx.save();
+      ctx.save();
       ctx.shadowColor = 'rgba(255,190,90,0.7)';
       ctx.shadowBlur = 6 * k;
       ctx.strokeStyle = 'rgba(255,215,140,0.5)';
@@ -3201,7 +3460,7 @@ async function saveSkySnapshot() {
       ctx.restore();
     });
 
-        // golden dust
+    // golden dust
     for (let i = 0; i < Math.round(W * H / 14000); i++) {
       const dx = wobble(i, 21) * W, dy = wobble(i, 23) * H, dr = 0.8 + wobble(i, 25) * 1.6;
       ctx.save();
@@ -3213,7 +3472,6 @@ async function saveSkySnapshot() {
     }
 
     // title + footer
-    
     ctx.textAlign = 'center';
     ctx.textBaseline = 'alphabetic';
     ctx.save();
@@ -3228,9 +3486,6 @@ async function saveSkySnapshot() {
     ctx.fillText("made with love for Xavier's birthday", W / 2, H - 24);
 
     const blob = await new Promise((res, rej) => cv.toBlob(b => b ? res(b) : rej(new Error('no picture')), 'image/png'));
-    const file = new File([blob], 'xavier-night-sky.png', { type: 'image/png' });
-    const touch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
-    
     downloadBlob(blob);
     showToast('Sky saved ♡', true);
   } catch (err) {
@@ -3254,6 +3509,7 @@ function spawnShootingStar() {
   s.addEventListener('animationend', () => s.remove());
 }
 setInterval(spawnShootingStar, 5500);
+
 /* cosmic dust: tiny golden specks drifting up through the sky */
 function spawnDust() {
   if (!skyIsOpen() || !motionOn || document.hidden) return;
@@ -3271,6 +3527,160 @@ function spawnDust() {
   d.addEventListener('animationend', () => d.remove());
 }
 setInterval(spawnDust, 650);
+
+
+/* ============================================================
+   WOW SKY — a living cosmos behind the constellation:
+   nebula clouds, a Milky Way band, a deep field of stars (some
+   twinkle with little sparkle-spikes), extra shooting stars, and
+   a gentle parallax when you move your finger / mouse.
+   ============================================================ */
+
+const cosmos = document.getElementById('skyCosmos');
+const cctx = cosmos.getContext('2d');
+const skyOrbit = document.getElementById('skyOrbit');
+const COSMOS_TINTS = ['255,255,255', '200,220,255', '255,236,200', '255,205,225', '215,200,255'];
+let cosmosBg = null, cosmosStars = [], cosmosW = 1, cosmosRAF = 0, cosmosLast = 0, cosmosResizeT;
+
+function buildCosmos() {
+  const W = sky.clientWidth, H = sky.clientHeight;
+  if (!W || !H) return;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  cosmosW = W;
+  cosmos.width = Math.round(W * dpr);
+  cosmos.height = Math.round(H * dpr);
+
+  // keep the little orbit rings centred on Xavier
+  skyOrbit.style.left = skyHub.style.left;
+  skyOrbit.style.top = skyHub.style.top;
+
+  // the still part of the sky is painted once, then re-used every frame
+  const bg = document.createElement('canvas');
+  bg.width = cosmos.width;
+  bg.height = cosmos.height;
+  const b = bg.getContext('2d');
+  b.scale(dpr, dpr);
+
+  // colourful nebula clouds
+  [[0.12, 0.18, '139,92,246', 0.30, 0.55], [0.86, 0.82, '236,100,160', 0.24, 0.60],
+   [0.72, 0.16, '70,130,255', 0.22, 0.50], [0.30, 0.80, '40,200,190', 0.14, 0.45],
+   [0.55, 0.50, '190,120,255', 0.10, 0.70]].forEach(([x, y, rgb, a, r]) => {
+    const R = Math.max(W, H) * r;
+    const g = b.createRadialGradient(W * x, H * y, 0, W * x, H * y, R);
+    g.addColorStop(0, `rgba(${rgb},${a})`);
+    g.addColorStop(0.5, `rgba(${rgb},${a * 0.35})`);
+    g.addColorStop(1, `rgba(${rgb},0)`);
+    b.fillStyle = g;
+    b.fillRect(0, 0, W, H);
+  });
+
+  // Milky Way: a tilted band of glow and tiny dust-stars
+  b.save();
+  b.translate(W / 2, H / 2);
+  b.rotate(-0.55);
+  const L = Math.hypot(W, H);
+  for (let i = 0; i < 26; i++) {
+    const x = (i / 25 - 0.5) * L, y = (Math.random() - 0.5) * H * 0.06;
+    const r = H * (0.14 + Math.random() * 0.14);
+    const rgb = i % 3 === 0 ? '255,210,230' : i % 3 === 1 ? '190,200,255' : '255,235,200';
+    const g = b.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, `rgba(${rgb},0.09)`);
+    g.addColorStop(1, `rgba(${rgb},0)`);
+    b.fillStyle = g;
+    b.fillRect(x - r, y - r, r * 2, r * 2);
+  }
+  const dust = Math.round(W * H / 450);
+  for (let i = 0; i < dust; i++) {
+    const x = (Math.random() - 0.5) * L;
+    const y = (Math.random() + Math.random() + Math.random() - 1.5) * H * 0.22;
+    const s = Math.random() < 0.15 ? 1.4 : 0.8;
+    b.fillStyle = `rgba(255,255,255,${0.15 + Math.random() * 0.55})`;
+    b.fillRect(x, y, s, s);
+  }
+  b.restore();
+
+  // the deep field of still stars
+  const still = Math.round(W * H / 1500);
+  for (let i = 0; i < still; i++) {
+    const r = 0.3 + Math.pow(Math.random(), 3) * 1.1;
+    b.fillStyle = `rgba(${COSMOS_TINTS[i % COSMOS_TINTS.length]},${0.35 + Math.random() * 0.6})`;
+    b.beginPath();
+    b.arc(Math.random() * W, Math.random() * H, r, 0, Math.PI * 2);
+    b.fill();
+  }
+  cosmosBg = bg;
+
+  // the stars that twinkle (the first few also get sparkle-spikes)
+  const tw = Math.min(260, Math.round(W * H / 7000));
+  cosmosStars = Array.from({ length: tw }, (_, i) => ({
+    x: Math.random() * W, y: Math.random() * H,
+    r: 0.6 + Math.random() * 1.6,
+    ph: Math.random() * 6.28, sp: 0.6 + Math.random() * 2.2,
+    tint: COSMOS_TINTS[i % COSMOS_TINTS.length],
+    spike: i < 16
+  }));
+  drawCosmos(0);
+}
+
+function drawCosmos(ms) {
+  if (!cosmosBg) return;
+  const dpr = cosmos.width / cosmosW;
+  cctx.setTransform(1, 0, 0, 1, 0, 0);
+  cctx.clearRect(0, 0, cosmos.width, cosmos.height);
+  cctx.drawImage(cosmosBg, 0, 0);
+  cctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const t = ms / 1000;
+  for (const s of cosmosStars) {
+    const a = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(t * s.sp + s.ph));
+    cctx.fillStyle = `rgba(${s.tint},${a})`;
+    cctx.beginPath();
+    cctx.arc(s.x, s.y, s.r, 0, 6.2832);
+    cctx.fill();
+    if (s.spike && a > 0.6) {
+      const len = 5 + s.r * 5 * a;
+      cctx.strokeStyle = `rgba(${s.tint},${(a - 0.6) * 1.4})`;
+      cctx.lineWidth = 0.8;
+      cctx.beginPath();
+      cctx.moveTo(s.x - len, s.y); cctx.lineTo(s.x + len, s.y);
+      cctx.moveTo(s.x, s.y - len); cctx.lineTo(s.x, s.y + len);
+      cctx.stroke();
+    }
+  }
+}
+
+function cosmosLoop(now) {
+  cosmosRAF = 0;
+  if (!skyIsOpen()) return;
+  if (motionOn && !document.hidden && now - cosmosLast > 33) { cosmosLast = now; drawCosmos(now); }
+  cosmosRAF = requestAnimationFrame(cosmosLoop);
+}
+
+function startCosmos() {
+  buildCosmos();
+  if (!cosmosRAF) cosmosRAF = requestAnimationFrame(cosmosLoop);
+}
+
+// wake the cosmos up whenever the night sky opens
+new MutationObserver(() => { if (skyIsOpen() && !cosmosRAF) startCosmos(); })
+  .observe(sky, { attributes: true, attributeFilter: ['class'] });
+
+window.addEventListener('resize', () => {
+  if (!skyIsOpen()) return;
+  clearTimeout(cosmosResizeT);
+  cosmosResizeT = setTimeout(buildCosmos, 300);   // runs just after the sky itself rebuilds
+});
+
+// the sky drifts a little as you move your finger / mouse
+sky.addEventListener('pointermove', e => {
+  if (!motionOn) return;
+  sky.style.setProperty('--px', ((e.clientX / sky.clientWidth - 0.5) * -14) + 'px');
+  sky.style.setProperty('--py', ((e.clientY / sky.clientHeight - 0.5) * -10) + 'px');
+});
+
+// more shooting stars, sometimes two in a row
+setInterval(spawnShootingStar, 3000);
+setInterval(() => { if (Math.random() < 0.4) setTimeout(spawnShootingStar, 350); }, 3000);
+
 skyStars.addEventListener('click', e => {
   const b = e.target.closest('.sky-star');
   if (!b) return;
@@ -3373,14 +3783,67 @@ setInterval(updateBirthdayUI, 3600000);   // rolls over to the next day if the p
    ============================================================ */
 
 const helpOverlay = document.getElementById('helpOverlay');
+const helpCard = document.getElementById('helpCard');
 const helpBtn = document.getElementById('helpBtn');
 const helpScroll = document.getElementById('helpScroll');
+const helpSparks = document.getElementById('helpSparks');
+const rvEls = Array.from(helpCard.querySelectorAll('.rv'));
+
+/* sparkles that float up inside the card */
+if (motionOn) {
+  for (let i = 0; i < 16; i++) {
+    const s = document.createElement('span');
+    s.className = 'hs';
+    s.style.left = (4 + wobble(i, 31) * 92) + '%';
+    s.style.setProperty('--sz', (4 + wobble(i, 33) * 6) + 'px');
+    s.style.setProperty('--du', (8 + wobble(i, 35) * 8) + 's');
+    s.style.setProperty('--dl', (-wobble(i, 37) * 12) + 's');
+    s.style.setProperty('--dx', ((wobble(i, 39) - 0.5) * 60) + 'px');
+    helpSparks.appendChild(s);
+  }
+}
+
+/* sections fade up one by one as they are scrolled into view */
+let rvObserver = null;
+if (motionOn && 'IntersectionObserver' in window) {
+  rvObserver = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (en.isIntersecting) { en.target.classList.add('in'); rvObserver.unobserve(en.target); }
+    });
+  }, { root: helpScroll, threshold: 0.12 });
+  helpCard.classList.add('rv-on');
+}
+
+function resetReveal() {
+  if (!rvObserver) return;
+  rvEls.forEach((el, i) => {
+    el.classList.remove('in');
+    rvObserver.unobserve(el);
+    rvObserver.observe(el);
+  });
+}
+
+/* keep the title on ONE line: shrink the text a little if the screen is narrow */
+function fitHelpTitle() {
+  const h = document.querySelector('#helpHead h2');
+  if (!h || !helpOverlay.classList.contains('open')) return;
+  h.style.fontSize = '';
+  let fs = parseFloat(getComputedStyle(h).fontSize);
+  while (h.scrollWidth > h.clientWidth + 1 && fs > 11) {
+    fs -= 0.5;
+    h.style.fontSize = fs + 'px';
+  }
+}
+window.addEventListener('resize', fitHelpTitle);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitHelpTitle);
 
 function openHelp() {
   helpOverlay.classList.add('open');
   helpOverlay.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
   helpScroll.scrollTop = 0;
+  resetReveal();
+  fitHelpTitle();
   document.getElementById('helpGo').focus();
 }
 
@@ -3400,7 +3863,7 @@ document.addEventListener('keydown', e => {
 });
 
 openHelp();
-  
+
 /* init */
 applyScale();
 refreshWall();
