@@ -2139,17 +2139,8 @@ async function saveSnapshot() {
     const file = new File([blob], 'xavier-wall-of-stars.png', { type: 'image/png' });
     const touch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
 
-    if (touch && navigator.canShare && navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({ files: [file], title: 'A Wall of Stars for Xavier' });
-        showToast('Wall saved ♡', true);
-      } catch (err) {
-        if (err && err.name !== 'AbortError') { downloadBlob(blob); showToast('Wall saved ♡', true); }
-      }
-    } else {
-      downloadBlob(blob);
-      showToast('Wall saved ♡', true);
-    }
+    downloadBlob(blob);
+    showToast('Wall saved ♡', true);
   } catch (err) {
     console.error('Snapshot failed:', err);
     showToast("Couldn't make the picture. Please try again.");
