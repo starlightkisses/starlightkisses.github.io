@@ -175,6 +175,92 @@
   .tool-btn:hover { transform: translateY(-1px); background: #fff; }
   .tool-btn:disabled { opacity: 0.6; cursor: wait; }
 
+
+  /* pencil button: only shown on notes written on this device */
+  .edit-btn {
+    position: absolute;
+    top: -12px;
+    right: -8px;
+    z-index: 2;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 1px solid rgba(203,185,142,0.85);
+    border-radius: 50%;
+    font-size: 13px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(150,130,170,0.25);
+    transition: transform 0.15s ease;
+  }
+  .edit-btn:hover { transform: scale(1.12); }
+  .note-big .edit-btn { display: none; }
+
+  /* edit / delete window */
+  #editOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(74,67,86,0.35);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 210;
+    padding: 20px;
+    overflow-y: auto;
+  }
+  #editOverlay.open { display: flex; }
+  #editPanel {
+    background: #fffdfa;
+    border: 1px solid rgba(185,166,224,0.3);
+    border-radius: 14px;
+    width: 100%;
+    max-width: 400px;
+    padding: 26px 26px 22px;
+    box-shadow: 0 30px 70px rgba(91,84,104,0.25);
+    margin: auto;
+  }
+  #editPanel h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-size: 1.5rem;
+    margin: 0 0 4px;
+    color: #4a4356;
+  }
+  #editPanel p.hint { margin: 0 0 16px; font-size: 0.82rem; color: rgba(91,84,104,0.55); }
+  #editPanel textarea {
+    width: 100%;
+    background: rgba(185,166,224,0.06);
+    border: 1px solid rgba(185,166,224,0.35);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #4a4356;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.92rem;
+    resize: none;
+  }
+  #editPanel textarea:focus { outline: none; border-color: #c9a36a; }
+  #editPanel .actions { display: flex; gap: 10px; align-items: center; margin-top: 18px; }
+  #editPanel .actions button {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.88rem;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+  }
+  #editDelete { margin-right: auto; background: transparent; color: #b5546b; border: 1px solid rgba(181,84,107,0.5) !important; }
+  #editCancel { background: transparent; color: rgba(91,84,104,0.6); }
+  #editSave { background: #cbb98e; color: #3c331a; font-weight: 500; }
+  #editSave:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* music button */
+  .tool-btn.on { background: #e3d5f7; border-color: #a893d1; color: #4a4356; }
+
   /* the wall */
   #wall-scroll {
     position: relative;
@@ -712,7 +798,7 @@
   <div id="star-field"></div>
 
 <header>
-  <div class="eyebrow">Designed & created by <strong>Ru</strong> (<a href="https://x.com/starlitbride_" target="_blank" rel="noopener" style="color: inherit; font-weight: 600; text-decoration: underline;">@starlitbride_</a>)</div>
+  <div class="eyebrow">Designed & created <strong>Ru</strong> (<a href="https://x.com/starlitbride_" target="_blank" rel="noopener" style="color: inherit; font-weight: 600; text-decoration: underline;">@starlitbride_</a>)</div>
   <h1>Wall of birthday wishes by Little Stars, <em>for Xavier</em></h1>
   <p class="sub">Leave a message and watch it find its place among the others. The wall keeps growing — as every single note stays.</p>
 
@@ -728,6 +814,7 @@
     <button class="tool-btn" id="findBtn">Find</button>
     <button class="tool-btn" id="shareBtn">Share</button>
     <button class="tool-btn" id="snapBtn">📷 Snapshot</button>
+    <button class="tool-btn" id="musicBtn" aria-pressed="false">🎵 Music</button>
   </div>
 </header>
 
@@ -803,6 +890,21 @@
   </div>
 </div>
 
+<div id="editOverlay">
+  <div id="editPanel">
+    <h2>Edit your wish</h2>
+    <p class="hint">Only you can see the pencil, and only on the device you wrote it on.</p>
+    <textarea id="editMsg" rows="3" maxlength="180"></textarea>
+    <div class="char-count"><span id="editCount">0</span>/180</div>
+    <div id="editWarn" style="display:none; color:#b5546b; font-size:0.82rem; margin:4px 0 0;">Please remove flagged word(s) before saving.</div>
+    <div class="actions">
+      <button id="editDelete">Delete</button>
+      <button id="editCancel">Cancel</button>
+      <button id="editSave">Save changes</button>
+    </div>
+  </div>
+</div>
+
 <div id="lightbox"></div>
 
 <footer style="font-weight: 700;">made with love for Xavier's birthday</footer>
@@ -847,7 +949,13 @@ async function saveMessage(note) {
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(note)
     });
-    return res.ok;
+    if (!res.ok) return false;
+    try {
+      const reply = await res.json();
+      return reply.ok !== false;   // the script says ok:false when it refuses
+    } catch (e) {
+      return true;                 // plain-text reply: treat as saved
+    }
   } catch (err) {
     console.error('Could not save message to the sheet:', err);
     return false;
@@ -865,7 +973,15 @@ function cleanNote(m) {
 }
 
 const keyOf = m => (Number(m.ts) || 0) + '|' + m.name;
-const sigOf = list => list.length + ':' + list.reduce((a, m) => Math.max(a, Number(m.ts) || 0), 0);
+const sigOf = list => {
+  let newest = 0, h = 0;
+  for (const m of list) {
+    newest = Math.max(newest, Number(m.ts) || 0);
+    const t = String(m.message || '');
+    for (let i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) | 0;
+  }
+  return list.length + ':' + newest + ':' + h;
+};
 
 /* ============================================================
    MOTION (falling stars, drop-in, confetti)
@@ -1101,6 +1217,20 @@ let wallCentered = false;
 /* hearts: remember which notes this visitor has already hearted */
 let likedKeys = new Set();
 try { likedKeys = new Set(JSON.parse(localStorage.getItem('wall-liked') || '[]')); } catch (e) {}
+/* edit rights: a secret token per note, kept only in this browser */
+let myTokens = {};
+try { myTokens = JSON.parse(localStorage.getItem('wall-mine') || '{}') || {}; } catch (e) {}
+function rememberMine() {
+  try { localStorage.setItem('wall-mine', JSON.stringify(myTokens)); } catch (e) {}
+}
+function makeToken() {
+  const a = new Uint8Array(16);
+  crypto.getRandomValues(a);
+  return Array.from(a, b => b.toString(16).padStart(2, '0')).join('');
+}
+const pendingEdits = new Map();     // key -> message, until the sheet confirms
+const pendingDeletes = new Set();   // keys, until the sheet confirms
+
 function rememberLiked() {
   try { localStorage.setItem('wall-liked', JSON.stringify([...likedKeys])); } catch (e) {}
 }
@@ -1167,6 +1297,15 @@ function drawWall(messages, opts = {}) {
     heart.querySelector('.h').textContent = likedKeys.has(key) ? '♥' : '♡';
     heart.querySelector('.n').textContent = Number(m.hearts) > 0 ? Number(m.hearts) : '';
     el.appendChild(heart);
+
+    if (myTokens[key]) {
+      const pencil = document.createElement('button');
+      pencil.type = 'button';
+      pencil.className = 'edit-btn';
+      pencil.setAttribute('aria-label', 'Edit or delete your wish');
+      pencil.textContent = '✏️';
+      el.appendChild(pencil);
+    }
 
     // wishes that weren't on the wall last time drop in gently
     if (drawnOnce && !knownKeys.has(key) && motionOn) {
@@ -1247,11 +1386,13 @@ function updateHearts(list) {
 }
 
 async function refreshWall() {
-  const loaded = await loadMessages();
+  let loaded = await loadMessages();
   if (loaded === null) {
     if (!wallLoaded) setCounter('error');   // a failed background check shouldn't scare anyone
     return;
   }
+  loaded = loaded.filter(m => !pendingDeletes.has(keyOf(m)));
+  loaded.forEach(m => { const pe = pendingEdits.get(keyOf(m)); if (pe !== undefined) m.message = pe; });
   if (document.fonts && document.fonts.ready) await document.fonts.ready;
   wallLoaded = true;
 
@@ -1273,6 +1414,7 @@ async function refreshWall() {
 setInterval(() => {
   if (document.hidden) return;
   if (overlay.classList.contains('open')) return;
+  if (editOverlay.classList.contains('open')) return;
   refreshWall();
 }, REFRESH_MS);
 
@@ -1317,6 +1459,8 @@ function sendHeart(btn) {
 }
 
 wall.addEventListener('click', e => {
+  const eb = e.target.closest('.edit-btn');
+  if (eb) { openEdit(eb.closest('.note').dataset.key); return; }
   const hb = e.target.closest('.heart-btn');
   if (hb) { sendHeart(hb); return; }
   const n = e.target.closest('.note');
@@ -1811,6 +1955,7 @@ document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   lightbox.classList.remove('open');
   if (overlay.classList.contains('open')) closePanel();
+  if (editOverlay.classList.contains('open')) closeEdit();
 });
 
 msgInput.addEventListener('input', () => {
@@ -1885,6 +2030,11 @@ submitBtn.addEventListener('click', () => {
     ts: Date.now()
   };
 
+  // a secret token that lets this browser (and only this browser) edit or delete the note
+  const token = makeToken();
+  myTokens[keyOf(note)] = token;
+  rememberMine();
+
   // show it on the wall right away
   pending.push(note);
   cachedMessages = [...cachedMessages, note];
@@ -1894,9 +2044,11 @@ submitBtn.addEventListener('click', () => {
   setTimeout(() => drawWall(cachedMessages, { focusKey: keyOf(note), celebrate: true }), 50);
 
   // save to Google Sheets quietly in the background
-  saveMessage(note).then(ok => {
+  saveMessage(Object.assign({}, note, { token })).then(ok => {
     pending = pending.filter(p => p !== note);
     if (ok) return;
+    delete myTokens[keyOf(note)];
+    rememberMine();
     // save failed: take the note off the wall and give the person their text back
     cachedMessages = cachedMessages.filter(m => m !== note);
     drawWall(cachedMessages);
@@ -1908,6 +2060,284 @@ submitBtn.addEventListener('click', () => {
     openPanel();
     showToast("Couldn't save your message, please try again.");
   });
+});
+
+/* ============================================================
+   EDIT OR DELETE YOUR OWN NOTE (pencil button)
+   ============================================================ */
+
+const editOverlay = document.getElementById('editOverlay');
+const editMsg = document.getElementById('editMsg');
+const editCount = document.getElementById('editCount');
+const editWarn = document.getElementById('editWarn');
+const editSave = document.getElementById('editSave');
+const editDelete = document.getElementById('editDelete');
+let editKey = null;
+let deleteArmed = false;
+
+function validateEdit() {
+  const flagged = findBannedMatch(editMsg.value);
+  editWarn.style.display = flagged ? 'block' : 'none';
+  editSave.disabled = !editMsg.value.trim() || !!flagged;
+}
+
+function openEdit(key) {
+  const m = findMsg(key);
+  if (!m || !myTokens[key]) return;
+  editKey = key;
+  deleteArmed = false;
+  editDelete.textContent = 'Delete';
+  editMsg.value = m.message;
+  editCount.textContent = String(m.message).length;
+  validateEdit();
+  editOverlay.classList.add('open');
+  editMsg.focus();
+}
+
+function closeEdit() {
+  editOverlay.classList.remove('open');
+  editKey = null;
+  deleteArmed = false;
+}
+
+editMsg.addEventListener('input', () => {
+  editCount.textContent = editMsg.value.length;
+  validateEdit();
+});
+document.getElementById('editCancel').addEventListener('click', closeEdit);
+editOverlay.addEventListener('click', e => { if (e.target === editOverlay) closeEdit(); });
+
+editSave.addEventListener('click', () => {
+  const key = editKey;
+  const m = findMsg(key);
+  if (!m) { closeEdit(); return; }
+  const newMsg = editMsg.value.trim().slice(0, 180);
+  if (!newMsg || newMsg === m.message) { closeEdit(); return; }
+  const oldMsg = m.message;
+  m.message = newMsg;
+  pendingEdits.set(key, newMsg);
+  closeEdit();
+  drawWall(cachedMessages, { focusKey: key });
+
+  saveMessage({ action: 'edit', ts: m.ts, name: m.name, token: myTokens[key], message: newMsg }).then(ok => {
+    pendingEdits.delete(key);
+    if (ok) { showToast('Your wish was updated ♡', true); return; }
+    const cur = findMsg(key);
+    if (cur) cur.message = oldMsg;
+    drawWall(cachedMessages);
+    showToast("Couldn't update your wish, please try again.");
+  });
+});
+
+editDelete.addEventListener('click', () => {
+  if (!deleteArmed) {                      // first tap asks, second tap deletes
+    deleteArmed = true;
+    editDelete.textContent = 'Tap again to delete';
+    return;
+  }
+  const key = editKey;
+  const m = findMsg(key);
+  const token = myTokens[key];
+  closeEdit();
+  if (!m) return;
+  pendingDeletes.add(key);
+  cachedMessages = cachedMessages.filter(x => x !== m);
+  drawWall(cachedMessages);
+
+  saveMessage({ action: 'delete', ts: m.ts, name: m.name, token }).then(ok => {
+    pendingDeletes.delete(key);
+    if (ok) { delete myTokens[key]; rememberMine(); showToast('Your wish was deleted.', true); return; }
+    cachedMessages = [...cachedMessages, m];
+    drawWall(cachedMessages);
+    showToast("Couldn't delete your wish, please try again.");
+  });
+});
+
+/* ============================================================
+   SPRING MUSIC — made live in the browser (no audio file needed):
+   a soft pad, glass-bell chimes, little bird chirps and a breeze.
+   Starts only when the visitor taps the button.
+   ============================================================ */
+
+const musicBtn = document.getElementById('musicBtn');
+let audio = null;
+let musicOn = false;
+let musicTimers = [];
+let chordIdx = 0;
+
+const PENTA = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];   // C D E G A C
+const CHORDS = [
+  [130.81, 261.63, 329.63, 392.00],   // C
+  [110.00, 261.63, 329.63, 440.00],   // Am
+  [87.31, 261.63, 349.23, 440.00],    // F
+  [98.00, 246.94, 293.66, 392.00]     // G
+];
+
+function buildAudio() {
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  if (!Ctx) return null;
+  const ctx = new Ctx();
+
+  const master = ctx.createGain();
+  master.gain.value = 0;
+  const soften = ctx.createBiquadFilter();
+  soften.type = 'lowpass';
+  soften.frequency.value = 5200;
+  master.connect(soften);
+  soften.connect(ctx.destination);
+
+  // bus for chimes and chirps, with a soft echo
+  const bus = ctx.createGain();
+  bus.gain.value = 1;
+  bus.connect(master);
+  const echo = ctx.createDelay(1.5);
+  echo.delayTime.value = 0.38;
+  const feedback = ctx.createGain();
+  feedback.gain.value = 0.35;
+  const wet = ctx.createGain();
+  wet.gain.value = 0.5;
+  bus.connect(echo);
+  echo.connect(feedback);
+  feedback.connect(echo);
+  echo.connect(wet);
+  wet.connect(master);
+
+  const pad = ctx.createGain();
+  pad.gain.value = 1;
+  pad.connect(master);
+
+  // breeze: quiet filtered noise that slowly swells
+  const buf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  const noise = ctx.createBufferSource();
+  noise.buffer = buf;
+  noise.loop = true;
+  const band = ctx.createBiquadFilter();
+  band.type = 'bandpass';
+  band.frequency.value = 600;
+  band.Q.value = 0.5;
+  const breeze = ctx.createGain();
+  breeze.gain.value = 0.02;
+  const lfo = ctx.createOscillator();
+  lfo.frequency.value = 0.09;
+  const lfoDepth = ctx.createGain();
+  lfoDepth.gain.value = 0.015;
+  lfo.connect(lfoDepth);
+  lfoDepth.connect(breeze.gain);
+  noise.connect(band);
+  band.connect(breeze);
+  breeze.connect(master);
+  noise.start();
+  lfo.start();
+
+  return { ctx, master, bus, pad };
+}
+
+function playChord(freqs) {
+  const c = audio.ctx, t = c.currentTime, life = 10;
+  freqs.forEach((f, i) => {
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = 'sine';
+    o.frequency.value = f;
+    o.detune.value = i % 2 ? 4 : -4;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.05, t + 3);
+    g.gain.linearRampToValueAtTime(0, t + life + 3);
+    o.connect(g);
+    g.connect(audio.pad);
+    o.start(t);
+    o.stop(t + life + 3.1);
+  });
+}
+
+function chime() {
+  const c = audio.ctx, t = c.currentTime;
+  const f = PENTA[Math.floor(Math.random() * PENTA.length)];
+  [[1, 0.09], [2, 0.03]].forEach(([mult, vol]) => {
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = 'sine';
+    o.frequency.value = f * mult;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 2.8);
+    o.connect(g);
+    g.connect(audio.bus);
+    o.start(t);
+    o.stop(t + 2.9);
+  });
+}
+
+function chirp() {
+  const c = audio.ctx;
+  let t = c.currentTime + 0.05;
+  const n = 2 + Math.floor(Math.random() * 3);
+  const base = 2200 + Math.random() * 1200;
+  for (let i = 0; i < n; i++) {
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(base, t);
+    o.frequency.exponentialRampToValueAtTime(base * 1.5, t + 0.07);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.03, t + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+    o.connect(g);
+    g.connect(audio.bus);
+    o.start(t);
+    o.stop(t + 0.1);
+    t += 0.12 + Math.random() * 0.05;
+  }
+}
+
+function musicLoop(fn, minMs, maxMs) {
+  if (!musicOn) return;
+  musicTimers.push(setTimeout(() => {
+    if (musicOn && !document.hidden) fn();
+    musicLoop(fn, minMs, maxMs);
+  }, minMs + Math.random() * (maxMs - minMs)));
+}
+
+function startMusic() {
+  if (!audio) audio = buildAudio();
+  if (!audio) { showToast("This browser can't play the music."); return; }
+  audio.ctx.resume();
+  audio.master.gain.cancelScheduledValues(audio.ctx.currentTime);
+  audio.master.gain.setTargetAtTime(0.5, audio.ctx.currentTime, 0.6);
+  musicOn = true;
+  musicBtn.classList.add('on');
+  musicBtn.setAttribute('aria-pressed', 'true');
+  musicBtn.textContent = '🎵 Music on';
+
+  playChord(CHORDS[chordIdx++ % CHORDS.length]);
+  musicTimers.push(setInterval(() => {
+    if (!document.hidden) playChord(CHORDS[chordIdx++ % CHORDS.length]);
+  }, 10000));
+  musicLoop(chime, 1400, 3800);
+  musicLoop(chirp, 4500, 10000);
+}
+
+function stopMusic() {
+  musicOn = false;
+  musicTimers.forEach(id => { clearTimeout(id); clearInterval(id); });
+  musicTimers = [];
+  musicBtn.classList.remove('on');
+  musicBtn.setAttribute('aria-pressed', 'false');
+  musicBtn.textContent = '🎵 Music';
+  if (!audio) return;
+  audio.master.gain.cancelScheduledValues(audio.ctx.currentTime);
+  audio.master.gain.setTargetAtTime(0, audio.ctx.currentTime, 0.25);
+  setTimeout(() => { if (!musicOn) audio.ctx.suspend(); }, 1200);
+}
+
+musicBtn.addEventListener('click', () => { musicOn ? stopMusic() : startMusic(); });
+
+// pause the sound while the tab is hidden, and bring it back afterwards
+document.addEventListener('visibilitychange', () => {
+  if (!audio || !musicOn) return;
+  if (document.hidden) audio.ctx.suspend(); else audio.ctx.resume();
 });
 
 /* ============================================================
