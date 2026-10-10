@@ -177,27 +177,34 @@
 
 
   /* pencil button: only shown on notes written on this device */
-  .edit-btn {
+    .edit-btn {
     position: absolute;
-    top: -12px;
-    right: -8px;
+    top: 6px;
+    right: 6px;
     z-index: 2;
-    width: 28px;
-    height: 28px;
+    width: 22px;
+    height: 22px;
     padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #ffffff;
-    border: 1px solid rgba(203,185,142,0.85);
+    background: rgba(255,255,255,0.35);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(203,185,142,0.45);
     border-radius: 50%;
-    font-size: 13px;
+    color: #a68a52;
     line-height: 1;
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(150,130,170,0.25);
-    transition: transform 0.15s ease;
+    opacity: 0.6;
+    transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
   }
-  .edit-btn:hover { transform: scale(1.12); }
+  .edit-btn:hover, .edit-btn:focus-visible {
+    opacity: 1;
+    transform: scale(1.1);
+    background: rgba(255,255,255,0.85);
+    box-shadow: 0 0 10px rgba(232,163,23,0.35);
+  }
   .note-big .edit-btn { display: none; }
 
   /* edit / delete window */
@@ -260,6 +267,141 @@
 
   /* music button */
   .tool-btn.on { background: #e3d5f7; border-color: #a893d1; color: #4a4356; }
+
+  /* doodle notes */
+  .doodle-cv {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: rgba(255,255,255,0.5);
+    border-radius: 3px;
+    margin-bottom: 10px;
+  }
+  #padCanvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: #ffffff;
+    border: 1px dashed rgba(185,166,224,0.7);
+    border-radius: 8px;
+    touch-action: none;
+    cursor: crosshair;
+  }
+  .pad-tools { margin-top: 10px; }
+  #editPanel.doodle-mode textarea,
+  #editPanel.doodle-mode .char-count,
+  #editPanel.doodle-mode #editWarn,
+  #editPanel.doodle-mode #editSave { display: none !important; }
+
+    /* constellation view: the wall as a night sky */
+  #sky {
+    position: fixed; inset: 0; z-index: 180; display: none; overflow: hidden;
+    background:
+      radial-gradient(700px 500px at 16% 12%, rgba(139,92,246,0.22), transparent 70%),
+      radial-gradient(800px 560px at 88% 90%, rgba(236,120,160,0.14), transparent 70%),
+      radial-gradient(600px 400px at 70% 20%, rgba(80,110,220,0.14), transparent 70%),
+      linear-gradient(180deg, #05060f 0%, #0b1030 45%, #1a1440 100%);
+  }
+  #sky.open { display: block; }
+  #sky::before, #sky::after { content: ""; position: absolute; inset: 0; pointer-events: none; background-repeat: repeat; }
+  #sky::before {
+    background-image:
+      radial-gradient(1px 1px at 12% 22%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 38% 64%, #fff, transparent),
+      radial-gradient(1px 1px at 63% 18%, #fff, transparent),
+      radial-gradient(1px 1px at 86% 72%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 74% 44%, #fff, transparent),
+      radial-gradient(1px 1px at 24% 88%, #fff, transparent);
+    background-size: 340px 340px;
+    animation: bg-twinkle 5s ease-in-out infinite;
+  }
+  #sky::after {
+    background-image:
+      radial-gradient(1.5px 1.5px at 8% 50%, #ffe9bd, transparent),
+      radial-gradient(1px 1px at 31% 12%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 55% 80%, #ffe9bd, transparent),
+      radial-gradient(1px 1px at 92% 30%, #fff, transparent),
+      radial-gradient(1px 1px at 47% 40%, #fff, transparent);
+    background-size: 520px 520px;
+    animation: bg-twinkle 7s ease-in-out -2.5s infinite;
+  }
+  @keyframes bg-twinkle { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
+  #skyMist {
+    position: absolute; inset: -10%; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(40% 30% at 25% 70%, rgba(167,139,250,0.14), transparent 70%),
+      radial-gradient(35% 28% at 75% 30%, rgba(244,143,177,0.12), transparent 70%);
+    filter: blur(30px);
+    animation: mist-drift 40s ease-in-out infinite alternate;
+  }
+  @keyframes mist-drift { from { transform: translate(-2%, 1%) scale(1); } to { transform: translate(2%, -2%) scale(1.08); } }
+  .shooting-star {
+    position: absolute; width: 110px; height: 2px; border-radius: 2px; pointer-events: none; z-index: 1;
+    background: linear-gradient(90deg, rgba(255,214,140,0), #fff1d6);
+    transform: rotate(28deg); opacity: 0;
+    animation: shoot 1.3s ease-out forwards;
+  }
+  @keyframes shoot {
+    0%   { opacity: 0; transform: translate(0, 0) rotate(28deg); }
+    15%  { opacity: 1; }
+    100% { opacity: 0; transform: translate(280px, 150px) rotate(28deg); }
+  }
+  #skyLines, #skyHub, #skyStars, #skyTitle { z-index: 1; }
+  #skyLines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  #skyLines path {
+    fill: none; stroke: rgba(255,210,130,0.38); stroke-width: 0.9; stroke-linecap: round;
+    animation: sky-lines-in 1.8s ease-out both;
+  }
+  @keyframes sky-lines-in { from { opacity: 0; } }
+  #skyStars { position: absolute; inset: 0; }
+  .sky-star {
+    --tint: #ffbf47;
+    position: absolute; width: 34px; height: 34px; transform: translate(-50%, -50%);
+    background: none; border: 0; padding: 0; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    filter: drop-shadow(0 0 5px rgba(255,184,56,0.85)) drop-shadow(0 0 12px rgba(255,150,30,0.45));
+  }
+  .sky-star::before {
+    content: ""; position: absolute; inset: 2px; border-radius: 50%;
+    background: radial-gradient(circle, var(--tint) 0%, transparent 68%); opacity: 0.4;
+  }
+  .sky-star-shape {
+    position: relative; display: block;
+    background: linear-gradient(145deg, #ffe08a, #ffb938 60%, #ff9d1f);
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    animation: sky-twinkle 4s ease-in-out infinite;
+    transition: transform 0.15s ease;
+  }
+  .sky-star:hover .sky-star-shape, .sky-star:focus-visible .sky-star-shape { transform: scale(1.5); }
+  .sky-star:focus-visible { outline: 2px solid #ffe9bd; border-radius: 50%; }
+  @keyframes sky-twinkle { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
+  .calm .sky-star-shape, .calm #skyLines path, .calm #skyMist, .calm .shooting-star,
+  .calm #sky::before, .calm #sky::after { animation: none; }
+  #skyHub {
+    position: absolute; transform: translate(-50%, -50%);
+    width: 78px; height: 78px; border-radius: 50%; overflow: hidden;
+    border: 2px solid #e8c27a;
+    box-shadow: 0 0 0 8px rgba(255,184,56,0.14), 0 0 60px rgba(255,184,56,0.45);
+    pointer-events: none;
+  }
+  #skyHub img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; display: block; }
+  #skyTitle {
+    position: absolute; top: 20px; left: 90px; right: 90px; text-align: center;
+    color: #fff1d6; font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-weight: 600; font-size: 1.5rem; line-height: 1.2;
+    text-shadow: 0 0 14px rgba(255,184,56,0.7); pointer-events: none;
+  }
+  #skySub {
+    display: block; margin-top: 4px; font-family: 'Outfit', sans-serif; font-style: normal;
+    font-weight: 300; font-size: 0.8rem; color: rgba(255,241,214,0.72); text-shadow: none;
+  }
+  #skyTools {
+    position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+    z-index: 2; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; width: max-content; max-width: 94vw;
+  }
+  #sky .tool-btn { background: rgba(255,255,255,0.1); border-color: rgba(255,200,120,0.4); color: #ffeccd; }
+  #sky .tool-btn:hover { background: rgba(255,200,120,0.2); }
+    
 
   /* the wall */
   #wall-scroll {
@@ -798,7 +940,7 @@
   <div id="star-field"></div>
 
 <header>
-  <div class="eyebrow">Designed & created <strong>Ru</strong> (<a href="https://x.com/starlitbride_" target="_blank" rel="noopener" style="color: inherit; font-weight: 600; text-decoration: underline;">@starlitbride_</a>)</div>
+  <div class="eyebrow">Designed & created by <strong>Ru</strong> (<a href="https://x.com/starlitbride_" target="_blank" rel="noopener" style="color: inherit; font-weight: 600; text-decoration: underline;">@starlitbride_</a>)</div>
   <h1>Wall of birthday wishes by Little Stars, <em>for Xavier</em></h1>
   <p class="sub">Leave a message and watch it find its place among the others. The wall keeps growing — as every single note stays.</p>
 
@@ -814,6 +956,7 @@
     <button class="tool-btn" id="findBtn">Find</button>
     <button class="tool-btn" id="shareBtn">Share</button>
     <button class="tool-btn" id="snapBtn">📷 Snapshot</button>
+    <button class="tool-btn" id="constBtn" aria-pressed="false">✦ Constellation</button>
     <button class="tool-btn" id="musicBtn" aria-pressed="false">🎵 Music</button>
   </div>
 </header>
@@ -843,12 +986,38 @@
     <h2>Leave your message</h2>
     <p class="hint">It'll be pinned somewhere on the wall ♡</p>
 
+    <div class="option-row" id="modeOptions">
+      <button class="opt-btn selected" data-mode="write">✎ Write</button>
+      <button class="opt-btn" data-mode="doodle">🎨 Doodle</button>
+    </div>
+
     <label for="nameInput">Your name or nickname</label>
     <input type="text" id="nameInput" maxlength="24" placeholder="e.g. a fellow traveler">
 
-    <label for="msgInput">Your message</label>
-    <textarea id="msgInput" rows="3" maxlength="180" placeholder="Say happy birthday..."></textarea>
-    <div class="char-count"><span id="charCount">0</span>/180</div>
+    <div id="writeBox">
+      <label for="msgInput">Your message</label>
+      <textarea id="msgInput" rows="3" maxlength="180" placeholder="Say happy birthday..."></textarea>
+      <div class="char-count"><span id="charCount">0</span>/180</div>
+    </div>
+    <div id="doodleBox" style="display:none;">
+      <label>Draw your doodle</label>
+      <canvas id="padCanvas" width="600" height="400"></canvas>
+      <div class="option-row pad-tools" id="padColors">
+        <div class="swatch selected" data-pc="0" style="background:#4a4356; border-color:#4a4356;"></div>
+        <div class="swatch" data-pc="1" style="background:#e0607e; border-color:#e0607e;"></div>
+        <div class="swatch" data-pc="2" style="background:#8a5fc0; border-color:#8a5fc0;"></div>
+        <div class="swatch" data-pc="3" style="background:#e0a93b; border-color:#e0a93b;"></div>
+        <div class="swatch" data-pc="4" style="background:#5b9bd5; border-color:#5b9bd5;"></div>
+        <div class="swatch" data-pc="5" style="background:#5fae7a; border-color:#5fae7a;"></div>
+      </div>
+      <div class="option-row pad-tools" id="padWidths">
+        <button class="opt-btn" data-pw="0">Thin</button>
+        <button class="opt-btn selected" data-pw="1">Medium</button>
+        <button class="opt-btn" data-pw="2">Thick</button>
+        <button class="opt-btn" id="padUndo">↶ Undo</button>
+        <button class="opt-btn" id="padClear">Clear</button>
+      </div>
+    </div>
     <div id="banWarning" style="display:none; color:#b5546b; font-size:0.82rem; margin:-8px 0 12px;">Please remove flagged word(s) before pinning.</div>
 
     <label>Size</label>
@@ -878,6 +1047,7 @@
 
     <div class="preview-wrap">
       <div class="note note-cream size-medium" id="previewNote" style="position:relative;transform:rotate(0deg);">
+        <canvas class="doodle-cv" id="previewDoodle" width="360" height="240" style="display:none;"></canvas>
         <div class="msg" id="previewMsg">Your message will look like this.</div>
         <div class="from" id="previewName">— you</div>
       </div>
@@ -892,8 +1062,8 @@
 
 <div id="editOverlay">
   <div id="editPanel">
-    <h2>Edit your wish</h2>
-    <p class="hint">Only you can see the pencil, and only on the device you wrote it on.</p>
+    <h2 id="editTitle">Edit your wish</h2>
+    <p class="hint" id="editHint">Only you can see the pencil, and only on the device you wrote it on.</p>
     <textarea id="editMsg" rows="3" maxlength="180"></textarea>
     <div class="char-count"><span id="editCount">0</span>/180</div>
     <div id="editWarn" style="display:none; color:#b5546b; font-size:0.82rem; margin:4px 0 0;">Please remove flagged word(s) before saving.</div>
@@ -902,6 +1072,19 @@
       <button id="editCancel">Cancel</button>
       <button id="editSave">Save changes</button>
     </div>
+  </div>
+</div>
+
+<div id="sky" aria-hidden="true">
+  <svg id="skyLines" xmlns="http://www.w3.org/2000/svg"></svg>
+  <div id="skyHub"><img src="xavier-card.jpg" alt=""></div>
+  <div id="skyStars"></div>
+  <div id="skyTitle">Every wish is a star<span id="skySub">Tap a star to read its wish</span></div>
+    <div id="skyMist"></div>
+  <div id="skyTools">
+    <button class="tool-btn" id="skyShare">Share</button>
+    <button class="tool-btn" id="skySnap">📷 Snapshot</button>
+    <button class="tool-btn" id="skyClose">← Back to the wall</button>
   </div>
 </div>
 
@@ -968,8 +1151,78 @@ function cleanNote(m) {
     color: ALLOWED_COLORS.includes(m.color) ? m.color : 'note-cream',
     size:  ALLOWED_SIZES.includes(m.size) ? m.size : 'medium',
     icon:  NOTE_ICONS.includes(m.icon) ? m.icon : NOTE_ICONS[0],
-    angle: Math.max(-15, Math.min(15, Number(m.angle) || 0))
+    angle: Math.max(-15, Math.min(15, Number(m.angle) || 0)),
+    doodle: cleanDoodle(m.doodle)
   };
+}
+
+/* ---- doodles: stored as a short list of strokes, never as an uploaded picture ----
+   one stroke = [colour number, width number, x1, y1, x2, y2, ...] on a 300 x 200 grid */
+const DOODLE_W = 300, DOODLE_H = 200;
+const DOODLE_COLORS = ['#4a4356', '#e0607e', '#8a5fc0', '#e0a93b', '#5b9bd5', '#5fae7a'];
+const DOODLE_WIDTHS = [3, 6, 11];
+const DOODLE_MAX_STROKES = 80, DOODLE_MAX_POINTS = 2000;
+
+function cleanDoodle(raw) {
+  let a = raw;
+  if (typeof raw === 'string') {
+    if (!raw) return null;
+    try { a = JSON.parse(raw); } catch (e) { return null; }
+  }
+  if (!Array.isArray(a) || !a.length || a.length > DOODLE_MAX_STROKES) return null;
+  const out = [];
+  let pts = 0;
+  for (const s of a) {
+    if (!Array.isArray(s) || s.length < 4 || s.length % 2 !== 0) return null;
+    const ci = Number(s[0]), wi = Number(s[1]);
+    if (!(ci >= 0 && ci < DOODLE_COLORS.length && ci % 1 === 0)) return null;
+    if (!(wi >= 0 && wi < DOODLE_WIDTHS.length && wi % 1 === 0)) return null;
+    const row = [ci, wi];
+    for (let j = 2; j < s.length; j += 2) {
+      const x = Number(s[j]), y = Number(s[j + 1]);
+      if (!isFinite(x) || !isFinite(y)) return null;
+      row.push(Math.max(0, Math.min(DOODLE_W, x)), Math.max(0, Math.min(DOODLE_H, y)));
+      pts++;
+    }
+    out.push(row);
+  }
+  return pts > DOODLE_MAX_POINTS ? null : out;
+}
+
+function paintDoodle(ctx, strokes, scale) {
+  ctx.save();
+  ctx.scale(scale, scale);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  for (const s of strokes) {
+    const color = DOODLE_COLORS[s[0]], width = DOODLE_WIDTHS[s[1]];
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = width;
+    if (s.length === 4) {                       // a single tap is a dot
+      ctx.beginPath();
+      ctx.arc(s[2], s[3], width / 2, 0, Math.PI * 2);
+      ctx.fill();
+      continue;
+    }
+    ctx.beginPath();
+    let px = s[2], py = s[3];
+    ctx.moveTo(px, py);
+    for (let i = 4; i + 1 < s.length; i += 2) {
+      const x = s[i], y = s[i + 1];
+      ctx.quadraticCurveTo(px, py, (px + x) / 2, (py + y) / 2);   // smooths the line
+      px = x; py = y;
+    }
+    ctx.lineTo(px, py);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function paintDoodleCanvas(cv, strokes) {
+  const ctx = cv.getContext('2d');
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  if (strokes && strokes.length) paintDoodle(ctx, strokes, cv.width / DOODLE_W);
 }
 
 const keyOf = m => (Number(m.ts) || 0) + '|' + m.name;
@@ -1279,8 +1532,13 @@ function drawWall(messages, opts = {}) {
     el.style.top = '0px';
     el.style.setProperty('--r', c.angle + 'deg');
     el.style.transform = `rotate(${c.angle}deg)`;
-    el.innerHTML = `<div class="msg"></div><div class="from"></div>`;
-    el.querySelector('.msg').textContent = m.message;
+    if (c.doodle) {
+      el.innerHTML = `<canvas class="doodle-cv" width="360" height="240"></canvas><div class="from"></div>`;
+      paintDoodleCanvas(el.querySelector('.doodle-cv'), c.doodle);
+    } else {
+      el.innerHTML = `<div class="msg"></div><div class="from"></div>`;
+      el.querySelector('.msg').textContent = m.message;
+    }
     el.querySelector('.from').textContent = `— ${m.name}`;
 
     const img = document.createElement('img');
@@ -1303,7 +1561,7 @@ function drawWall(messages, opts = {}) {
       pencil.type = 'button';
       pencil.className = 'edit-btn';
       pencil.setAttribute('aria-label', 'Edit or delete your wish');
-      pencil.textContent = '✏️';
+            pencil.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 2.8 0l.2.2a2 2 0 0 1 0 2.8L8 19l-4 1z"/><path d="M14 7l3 3"/></svg>';
       el.appendChild(pencil);
     }
 
@@ -1359,6 +1617,7 @@ function drawWall(messages, opts = {}) {
   }
 
   if (focusEl) focusNote(focusEl, opts.celebrate);
+  if (skyIsOpen()) buildSky();   // keep the night sky up to date
 }
 
 function mergePending(loaded) {
@@ -1465,6 +1724,11 @@ wall.addEventListener('click', e => {
   if (hb) { sendHeart(hb); return; }
   const n = e.target.closest('.note');
   if (!n) return;
+  showBig(n);
+});
+
+function showBig(n) {
+  const key = n.dataset.key;
   const big = n.cloneNode(true);
   big.className = n.className.replace(/\bsize-\w+\b|\bnote-drop\b|\bnote-found\b/g, '').trim() + ' note-big';
   big.removeAttribute('data-key');
@@ -1472,7 +1736,11 @@ wall.addEventListener('click', e => {
   lightbox.innerHTML = '';
   lightbox.appendChild(big);
   lightbox.classList.add('open');
-});
+  // a copied canvas comes out blank, so draw the doodle again
+  const dcv = big.querySelector('.doodle-cv');
+  const m = findMsg(key);
+  if (dcv && m) paintDoodleCanvas(dcv, cleanDoodle(m.doodle));
+}
 
 lightbox.addEventListener('click', e => {
   if (!e.target.closest('.note-big')) lightbox.classList.remove('open');
@@ -1779,16 +2047,34 @@ async function saveSnapshot() {
       ctx.textBaseline = 'middle';
       ctx.fillStyle = '#4a4356';
       ctx.font = '400 15.2px Outfit, sans-serif';
-      const lines = wrapLines(ctx, el.querySelector('.msg').textContent, w - 38);
       const LH = 21.28;
       const top0 = -h / 2 + 1 + 16;
-      lines.forEach((ln, li) => ctx.fillText(ln, -w / 2 + 1 + 18, top0 + li * LH + LH / 2));
+      let blockH;
+      if (el.querySelector('.doodle-cv')) {
+        const dm = findMsg(el.dataset.key);
+        const strokes = dm ? cleanDoodle(dm.doodle) : null;
+        const cw = w - 38;
+        blockH = cw * DOODLE_H / DOODLE_W;
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.fillRect(-w / 2 + 1 + 18, top0, cw, blockH);
+        if (strokes) {
+          ctx.save();
+          ctx.translate(-w / 2 + 1 + 18, top0);
+          paintDoodle(ctx, strokes, cw / DOODLE_W);
+          ctx.restore();
+        }
+        ctx.fillStyle = '#4a4356';
+      } else {
+        const lines = wrapLines(ctx, el.querySelector('.msg').textContent, w - 38);
+        lines.forEach((ln, li) => ctx.fillText(ln, -w / 2 + 1 + 18, top0 + li * LH + LH / 2));
+        blockH = lines.length * LH;
+      }
 
       // name
       ctx.textAlign = 'right';
       ctx.globalAlpha = 0.75;
       ctx.font = 'italic 400 15.2px "Cormorant Garamond", serif';
-      ctx.fillText(el.querySelector('.from').textContent, w / 2 - 1 - 18, top0 + lines.length * LH + 10 + LH / 2);
+      ctx.fillText(el.querySelector('.from').textContent, w / 2 - 1 - 18, top0 + blockH + 10 + LH / 2);
       ctx.globalAlpha = 1;
 
       // corner icon
@@ -1883,6 +2169,8 @@ const banWarning = document.getElementById('banWarning');
 const previewNote = document.getElementById('previewNote');
 const previewMsg = document.getElementById('previewMsg');
 const previewName = document.getElementById('previewName');
+const previewDoodle = document.getElementById('previewDoodle');
+const padCanvas = document.getElementById('padCanvas');
 
 /* ============================================================
    BANNED WORDS
@@ -1935,7 +2223,101 @@ function findBannedMatch(text){
   return null;
 }
 
-let state = { size: 'medium', angle: 0, color: 'note-cream' };
+let state = { size: 'medium', angle: 0, color: 'note-cream', mode: 'write' };
+
+/* doodle pad */
+let padStrokes = [];
+let curStroke = null;
+let padColor = 0;
+let padWidth = 1;
+
+function padPointCount() {
+  let n = 0;
+  for (const s of padStrokes) n += (s.length - 2) / 2;
+  if (curStroke) n += (curStroke.length - 2) / 2;
+  return n;
+}
+
+function padRepaint() {
+  const ctx = padCanvas.getContext('2d');
+  ctx.clearRect(0, 0, padCanvas.width, padCanvas.height);
+  const all = curStroke ? padStrokes.concat([curStroke]) : padStrokes;
+  paintDoodle(ctx, all, padCanvas.width / DOODLE_W);
+}
+
+function padPoint(e) {
+  const r = padCanvas.getBoundingClientRect();
+  return [
+    Math.max(0, Math.min(DOODLE_W, Math.round((e.clientX - r.left) / r.width * DOODLE_W))),
+    Math.max(0, Math.min(DOODLE_H, Math.round((e.clientY - r.top) / r.height * DOODLE_H)))
+  ];
+}
+
+padCanvas.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  if (padStrokes.length >= DOODLE_MAX_STROKES || padPointCount() >= DOODLE_MAX_POINTS - 10) {
+    showToast("That's all the ink for one doodle ♡", true);
+    return;
+  }
+  padCanvas.setPointerCapture(e.pointerId);
+  const [x, y] = padPoint(e);
+  curStroke = [padColor, padWidth, x, y];
+  padRepaint();
+});
+
+padCanvas.addEventListener('pointermove', e => {
+  if (!curStroke) return;
+  if (padPointCount() >= DOODLE_MAX_POINTS - 2) return;
+  const [x, y] = padPoint(e);
+  const n = curStroke.length;
+  const dx = x - curStroke[n - 2], dy = y - curStroke[n - 1];
+  if (dx * dx + dy * dy < 4) return;      // skip tiny moves to keep the doodle small
+  curStroke.push(x, y);
+  padRepaint();
+});
+
+function endStroke() {
+  if (!curStroke) return;
+  padStrokes.push(curStroke);
+  curStroke = null;
+  padRepaint();
+  updatePreview();
+  validate();
+}
+padCanvas.addEventListener('pointerup', endStroke);
+padCanvas.addEventListener('pointercancel', endStroke);
+
+document.getElementById('padColors').addEventListener('click', e => {
+  if (e.target.dataset.pc === undefined) return;
+  padColor = Number(e.target.dataset.pc);
+  document.querySelectorAll('#padColors .swatch').forEach(s => s.classList.toggle('selected', s === e.target));
+});
+document.getElementById('padWidths').addEventListener('click', e => {
+  if (e.target.dataset.pw === undefined) return;
+  padWidth = Number(e.target.dataset.pw);
+  document.querySelectorAll('#padWidths .opt-btn[data-pw]').forEach(b => b.classList.toggle('selected', b === e.target));
+});
+document.getElementById('padUndo').addEventListener('click', () => {
+  padStrokes.pop();
+  padRepaint(); updatePreview(); validate();
+});
+document.getElementById('padClear').addEventListener('click', () => {
+  padStrokes = [];
+  padRepaint(); updatePreview(); validate();
+});
+
+function setMode(mode) {
+  state.mode = mode;
+  document.querySelectorAll('#modeOptions .opt-btn').forEach(b => b.classList.toggle('selected', b.dataset.mode === mode));
+  document.getElementById('writeBox').style.display = mode === 'write' ? '' : 'none';
+  document.getElementById('doodleBox').style.display = mode === 'doodle' ? '' : 'none';
+  if (mode === 'doodle') padRepaint();
+  updatePreview();
+  validate();
+}
+document.getElementById('modeOptions').addEventListener('click', e => {
+  if (e.target.dataset.mode) setMode(e.target.dataset.mode);
+});
 
 function openPanel() { overlay.classList.add('open'); }
 function closePanel() {
@@ -1943,8 +2325,9 @@ function closePanel() {
   nameInput.value = ''; msgInput.value = '';
   charCount.textContent = '0';
   banWarning.style.display = 'none';
-  updatePreview();
-  validate();
+  padStrokes = [];
+  curStroke = null;
+  setMode('write');
 }
 
 cta.addEventListener('click', openPanel);
@@ -1953,9 +2336,11 @@ overlay.addEventListener('click', e => { if (e.target === overlay) closePanel();
 
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
+  const bigWasOpen = lightbox.classList.contains('open');
   lightbox.classList.remove('open');
   if (overlay.classList.contains('open')) closePanel();
   if (editOverlay.classList.contains('open')) closeEdit();
+  if (!bigWasOpen && skyIsOpen()) closeSky();
 });
 
 msgInput.addEventListener('input', () => {
@@ -1989,17 +2374,23 @@ document.getElementById('colorOptions').addEventListener('click', e => {
 function updatePreview() {
   previewNote.className = `note ${state.color} size-${state.size}`;
   previewNote.style.transform = `rotate(${state.angle}deg)`;
+  const doodling = state.mode === 'doodle';
+  previewMsg.style.display = doodling ? 'none' : '';
+  previewDoodle.style.display = doodling ? 'block' : 'none';
+  if (doodling) paintDoodleCanvas(previewDoodle, padStrokes);
   previewMsg.textContent = msgInput.value || 'Your message will look like this.';
   previewName.textContent = `— ${nameInput.value || 'you'}`;
 }
 
 function validate() {
+  const doodling = state.mode === 'doodle';
   const nameMatch = findBannedMatch(nameInput.value);
-  const msgMatch = findBannedMatch(msgInput.value);
+  const msgMatch = doodling ? null : findBannedMatch(msgInput.value);
   const flagged = nameMatch || msgMatch;
 
   banWarning.style.display = flagged ? 'block' : 'none';
-  submitBtn.disabled = !(nameInput.value.trim() && msgInput.value.trim()) || !!flagged;
+  const hasContent = doodling ? padStrokes.length > 0 : !!msgInput.value.trim();
+  submitBtn.disabled = !(nameInput.value.trim() && hasContent) || !!flagged;
 }
 
 let toastTimer;
@@ -2020,14 +2411,15 @@ function showToast(text, ok) {
 submitBtn.addEventListener('click', () => {
   const note = {
     name: nameInput.value.trim().slice(0, 24),
-    message: msgInput.value.trim().slice(0, 180),
+    message: state.mode === 'doodle' ? '' : msgInput.value.trim().slice(0, 180),
     size: state.size,
     angle: state.angle,
     color: state.color,
     icon: NOTE_ICONS[Math.floor(Math.random() * NOTE_ICONS.length)],
     x: 0,
     y: 0,
-    ts: Date.now()
+    ts: Date.now(),
+    doodle: state.mode === 'doodle' ? JSON.stringify(padStrokes) : ''
   };
 
   // a secret token that lets this browser (and only this browser) edit or delete the note
@@ -2055,6 +2447,10 @@ submitBtn.addEventListener('click', () => {
     nameInput.value = note.name;
     msgInput.value = note.message;
     charCount.textContent = note.message.length;
+    if (note.doodle) {
+      padStrokes = cleanDoodle(note.doodle) || [];
+      setMode('doodle');
+    }
     updatePreview();
     validate();
     openPanel();
@@ -2087,6 +2483,12 @@ function openEdit(key) {
   editKey = key;
   deleteArmed = false;
   editDelete.textContent = 'Delete';
+  const isDoodle = !!cleanDoodle(m.doodle);
+  document.getElementById('editPanel').classList.toggle('doodle-mode', isDoodle);
+  document.getElementById('editTitle').textContent = isDoodle ? 'Your doodle' : 'Edit your wish';
+  document.getElementById('editHint').textContent = isDoodle
+    ? "Doodles can't be changed, but you can delete this one and draw a new one."
+    : 'Only you can see the pencil, and only on the device you wrote it on.';
   editMsg.value = m.message;
   editCount.textContent = String(m.message).length;
   validateEdit();
@@ -2338,6 +2740,275 @@ musicBtn.addEventListener('click', () => { musicOn ? stopMusic() : startMusic();
 document.addEventListener('visibilitychange', () => {
   if (!audio || !musicOn) return;
   if (document.hidden) audio.ctx.suspend(); else audio.ctx.resume();
+});
+
+/* ============================================================
+   CONSTELLATION VIEW — every note becomes a star; the stars are
+   joined by the shortest lines that connect them all, like a
+   constellation. Oldest wishes sit near Xavier, newest at the edge.
+   ============================================================ */
+
+const sky = document.getElementById('sky');
+const skyStars = document.getElementById('skyStars');
+const skyLines = document.getElementById('skyLines');
+const skyHub = document.getElementById('skyHub');
+const skyTitle = document.getElementById('skyTitle');
+const constBtn = document.getElementById('constBtn');
+const skyClose = document.getElementById('skyClose');
+const STAR_TINT = { 'note-cream': '#ffbf47', 'note-lav': '#ffbf47', 'note-blush': '#ffbf47', 'note-mint': '#ffbf47', 'note-sky': '#ffbf47' };
+let skyTimer;
+
+function skyIsOpen() { return sky.classList.contains('open'); }
+
+function buildSky() {
+  const W = sky.clientWidth, H = sky.clientHeight;
+  const list = cachedMessages.slice().sort((a, b) => (Number(a.ts) || 0) - (Number(b.ts) || 0));
+  const n = list.length;
+  const cx = W / 2, cy = H * 0.54;
+  const rx = W * 0.45, ry = H * 0.36;
+
+  skyStars.innerHTML = '';
+  skyLines.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  skyLines.innerHTML = '';
+  skyHub.style.left = cx + 'px';
+  skyHub.style.top = cy + 'px';
+  skyTitle.firstChild.textContent = n === 0 ? 'The sky is waiting for its first star' : countText(n).replace('have left a wish', 'have lit up the sky').replace('has left a wish', 'has lit up the sky');
+
+  // sunflower-style spread: even, with a little wobble so it feels natural
+  const pts = list.map((m, i) => {
+    const r = 0.16 + 0.84 * Math.sqrt((i + 0.5) / n);
+    const a = i * 2.399963 + wobble(i, 3) * 0.7;
+    const j = 1 + (wobble(i, 7) - 0.5) * 0.2;
+    return { m, x: cx + Math.cos(a) * r * rx * j, y: cy + Math.sin(a) * r * ry * j };
+  });
+
+  // shortest lines that link every star (a minimum spanning tree)
+  if (n > 1) {
+    const inTree = new Array(n).fill(false);
+    const dist = new Array(n).fill(Infinity);
+    const from = new Array(n).fill(-1);
+    dist[0] = 0;
+    let d = '';
+    for (let k = 0; k < n; k++) {
+      let u = -1;
+      for (let i = 0; i < n; i++) if (!inTree[i] && (u < 0 || dist[i] < dist[u])) u = i;
+      inTree[u] = true;
+      if (from[u] >= 0) {
+        const a = pts[from[u]];
+        d += `M${a.x.toFixed(1)} ${a.y.toFixed(1)}L${pts[u].x.toFixed(1)} ${pts[u].y.toFixed(1)}`;
+      }
+      for (let v = 0; v < n; v++) {
+        if (inTree[v]) continue;
+        const dx = pts[u].x - pts[v].x, dy = pts[u].y - pts[v].y;
+        const dd = dx * dx + dy * dy;
+        if (dd < dist[v]) { dist[v] = dd; from[v] = u; }
+      }
+    }
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', d);
+    skyLines.appendChild(path);
+  }
+
+  const frag = document.createDocumentFragment();
+  pts.forEach((p, i) => {
+    const c = cleanNote(p.m);
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'sky-star';
+    b.dataset.key = keyOf(p.m);
+    b.style.left = p.x + 'px';
+    b.style.top = p.y + 'px';
+    b.style.setProperty('--tint', STAR_TINT[c.color]);
+    b.title = '— ' + p.m.name;
+    b.setAttribute('aria-label', 'Wish from ' + p.m.name);
+    const size = 14 + Math.min(Number(p.m.hearts) || 0, 10) * 1.6;   // hearted wishes shine bigger
+    const shape = document.createElement('span');
+    shape.className = 'sky-star-shape';
+    shape.style.width = size + 'px';
+    shape.style.height = size + 'px';
+    shape.style.animationDuration = (3 + wobble(i, 5) * 3) + 's';
+    shape.style.animationDelay = (-wobble(i, 9) * 5) + 's';
+    b.appendChild(shape);
+    frag.appendChild(b);
+  });
+  skyStars.appendChild(frag);
+}
+
+function openSky() {
+  sky.classList.add('open');
+  sky.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  constBtn.classList.add('on');
+  constBtn.setAttribute('aria-pressed', 'true');
+  buildSky();
+  skyClose.focus();
+}
+
+function closeSky() {
+  sky.classList.remove('open');
+  sky.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  constBtn.classList.remove('on');
+  constBtn.setAttribute('aria-pressed', 'false');
+  constBtn.focus();
+}
+
+constBtn.addEventListener('click', () => { skyIsOpen() ? closeSky() : openSky(); });
+skyClose.addEventListener('click', closeSky);
+document.getElementById('skyShare').addEventListener('click', () => document.getElementById('shareBtn').click());
+
+/* snapshot of the night sky */
+async function saveSkySnapshot() {
+  const btn = document.getElementById('skySnap');
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  try {
+    if (document.fonts) {
+      await Promise.all([
+        document.fonts.load('italic 600 24px "Cormorant Garamond"'),
+        document.fonts.load('300 13px "Outfit"')
+      ]);
+    }
+    const W = sky.clientWidth, H = sky.clientHeight;
+    const k = Math.min(2, Math.sqrt(8000000 / (W * H)));
+    const cv = document.createElement('canvas');
+    cv.width = Math.round(W * k);
+    cv.height = Math.round(H * k);
+    const ctx = cv.getContext('2d');
+    ctx.scale(k, k);
+
+    // sky + soft colour clouds
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#05060f'); g.addColorStop(0.45, '#0b1030'); g.addColorStop(1, '#1a1440');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    [[0.16, 0.12, '139,92,246', 0.22, 520], [0.88, 0.9, '236,120,160', 0.15, 560], [0.7, 0.2, '80,110,220', 0.14, 420]]
+      .forEach(([x, y, rgb, a, r]) => {
+        const rg = ctx.createRadialGradient(W * x, H * y, 0, W * x, H * y, r);
+        rg.addColorStop(0, `rgba(${rgb},${a})`);
+        rg.addColorStop(1, `rgba(${rgb},0)`);
+        ctx.fillStyle = rg;
+        ctx.fillRect(0, 0, W, H);
+      });
+
+    // tiny background stars
+    for (let i = 0; i < Math.round(W * H / 5000); i++) {
+      ctx.fillStyle = `rgba(255,255,255,${0.3 + wobble(i, 2) * 0.6})`;
+      ctx.beginPath();
+      ctx.arc(wobble(i, 11) * W, wobble(i, 5) * H, 0.5 + wobble(i, 9) * 1.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // constellation lines
+    const lp = skyLines.querySelector('path');
+    if (lp) {
+      ctx.strokeStyle = 'rgba(255,210,130,0.4)';
+      ctx.lineWidth = 0.9;
+      ctx.lineCap = 'round';
+      ctx.stroke(new Path2D(lp.getAttribute('d')));
+    }
+
+    // Xavier in the middle
+    const hx = parseFloat(skyHub.style.left), hy = parseFloat(skyHub.style.top), hr = 39;
+    ctx.save();
+    ctx.shadowColor = 'rgba(255,184,56,0.55)';
+    ctx.shadowBlur = 40 * k;
+    ctx.fillStyle = '#1a1440';
+    ctx.beginPath(); ctx.arc(hx, hy, hr, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+    const him = await loadImg(skyHub.querySelector('img').getAttribute('src'));
+    if (him) {
+      ctx.save();
+      ctx.beginPath(); ctx.arc(hx, hy, hr, 0, Math.PI * 2); ctx.clip();
+      const r = Math.max(hr * 2 / him.width, hr * 2 / him.height);
+      const iw = him.width * r, ih = him.height * r;
+      ctx.drawImage(him, hx - iw / 2, hy - hr + (hr * 2 - ih) * 0.18, iw, ih);
+      ctx.restore();
+    }
+    ctx.strokeStyle = '#e8c27a';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(hx, hy, hr, 0, Math.PI * 2); ctx.stroke();
+
+    // amber stars
+    const pts = [[50,0],[61,35],[98,35],[68,57],[79,91],[50,70],[21,91],[32,57],[2,35],[39,35]];
+    skyStars.querySelectorAll('.sky-star').forEach(b => {
+      const x = parseFloat(b.style.left), y = parseFloat(b.style.top);
+      const s = parseFloat(b.querySelector('.sky-star-shape').style.width);
+      const rg = ctx.createRadialGradient(x, y, 0, x, y, s * 1.3);
+      rg.addColorStop(0, 'rgba(255,184,56,0.55)');
+      rg.addColorStop(1, 'rgba(255,184,56,0)');
+      ctx.fillStyle = rg;
+      ctx.fillRect(x - s * 1.3, y - s * 1.3, s * 2.6, s * 2.6);
+      ctx.save();
+      ctx.shadowColor = 'rgba(255,184,56,0.9)';
+      ctx.shadowBlur = 8 * k;
+      ctx.fillStyle = '#ffc857';
+      ctx.beginPath();
+      pts.forEach(([px, py], i) => {
+        const X = x + (px - 50) / 100 * s, Y = y + (py - 50) / 100 * s;
+        i ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y);
+      });
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    });
+
+    // title + footer
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.save();
+    ctx.shadowColor = 'rgba(255,184,56,0.7)';
+    ctx.shadowBlur = 14 * k;
+    ctx.fillStyle = '#fff1d6';
+    ctx.font = 'italic 600 24px "Cormorant Garamond", serif';
+    ctx.fillText(skyTitle.firstChild.textContent, W / 2, 46);
+    ctx.restore();
+    ctx.fillStyle = 'rgba(255,241,214,0.7)';
+    ctx.font = '300 13px Outfit, sans-serif';
+    ctx.fillText("made with love for Xavier's birthday", W / 2, H - 24);
+
+    const blob = await new Promise((res, rej) => cv.toBlob(b => b ? res(b) : rej(new Error('no picture')), 'image/png'));
+    const file = new File([blob], 'xavier-night-sky.png', { type: 'image/png' });
+    const touch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    if (touch && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: 'A Wall of Stars for Xavier' }); } catch (err) {}
+    } else {
+      downloadBlob(blob);
+    }
+    showToast('Sky saved ♡', true);
+  } catch (err) {
+    console.error('Sky snapshot failed:', err);
+    showToast("Couldn't make the picture. Please try again.");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = label;
+  }
+}
+document.getElementById('skySnap').addEventListener('click', saveSkySnapshot);
+
+/* an occasional shooting star across the night sky */
+function spawnShootingStar() {
+  if (!skyIsOpen() || !motionOn || document.hidden) return;
+  const s = document.createElement('div');
+  s.className = 'shooting-star';
+  s.style.left = (10 + Math.random() * 60) + '%';
+  s.style.top = (2 + Math.random() * 35) + '%';
+  sky.appendChild(s);
+  s.addEventListener('animationend', () => s.remove());
+}
+setInterval(spawnShootingStar, 5500);
+skyStars.addEventListener('click', e => {
+  const b = e.target.closest('.sky-star');
+  if (!b) return;
+  const note = Array.from(wall.querySelectorAll('.note')).find(x => x.dataset.key === b.dataset.key);
+  if (note) showBig(note);
+});
+
+window.addEventListener('resize', () => {
+  if (!skyIsOpen()) return;
+  clearTimeout(skyTimer);
+  skyTimer = setTimeout(buildSky, 150);
 });
 
 /* ============================================================
