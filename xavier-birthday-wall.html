@@ -2908,7 +2908,9 @@ function openSky() {
   document.body.style.overflow = 'hidden';
   constBtn.classList.add('on');
   constBtn.setAttribute('aria-pressed', 'true');
+  sky.classList.add('sky-intro');
   buildSky();
+  setTimeout(() => sky.classList.remove('sky-intro'), 4500);
   skyClose.focus();
 }
 
@@ -2971,17 +2973,21 @@ async function saveSkySnapshot() {
     // constellation lines
     const lp = skyLines.querySelector('path');
     if (lp) {
-      ctx.strokeStyle = 'rgba(255,210,130,0.4)';
+            ctx.save();
+      ctx.shadowColor = 'rgba(255,190,90,0.7)';
+      ctx.shadowBlur = 6 * k;
+      ctx.strokeStyle = 'rgba(255,215,140,0.5)';
       ctx.lineWidth = 0.9;
       ctx.lineCap = 'round';
       ctx.stroke(new Path2D(lp.getAttribute('d')));
+      ctx.restore();
     }
 
     // Xavier in the middle
     const hx = parseFloat(skyHub.style.left), hy = parseFloat(skyHub.style.top), hr = 39;
     ctx.save();
-    ctx.shadowColor = 'rgba(255,184,56,0.55)';
-    ctx.shadowBlur = 40 * k;
+    ctx.shadowColor = 'rgba(255,184,56,0.8)';
+    ctx.shadowBlur = 80 * k;
     ctx.fillStyle = '#1a1440';
     ctx.beginPath(); ctx.arc(hx, hy, hr, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
@@ -3009,9 +3015,21 @@ async function saveSkySnapshot() {
       ctx.fillStyle = rg;
       ctx.fillRect(x - s * 1.3, y - s * 1.3, s * 2.6, s * 2.6);
       ctx.save();
+      const gl = parseFloat(b.style.getPropertyValue('--g')) || 1;
+      const c1 = b.style.getPropertyValue('--c1').trim() || '#ffe08a';
+      const c2 = b.style.getPropertyValue('--c2').trim() || '#ffb938';
+      const c3 = b.style.getPropertyValue('--c3').trim() || '#ff9d1f';
+      ctx.strokeStyle = 'rgba(255,240,200,0.8)';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(x - s * 0.95, y); ctx.lineTo(x + s * 0.95, y);
+      ctx.moveTo(x, y - s * 0.95); ctx.lineTo(x, y + s * 0.95);
+      ctx.stroke();
+      const sg = ctx.createLinearGradient(x - s / 2, y - s / 2, x + s / 2, y + s / 2);
+      sg.addColorStop(0, c1); sg.addColorStop(0.6, c2); sg.addColorStop(1, c3);
       ctx.shadowColor = 'rgba(255,184,56,0.9)';
-      ctx.shadowBlur = 8 * k;
-      ctx.fillStyle = '#ffc857';
+      ctx.shadowBlur = 8 * k * gl;
+      ctx.fillStyle = sg;
       ctx.beginPath();
       pts.forEach(([px, py], i) => {
         const X = x + (px - 50) / 100 * s, Y = y + (py - 50) / 100 * s;
@@ -3022,7 +3040,19 @@ async function saveSkySnapshot() {
       ctx.restore();
     });
 
+        // golden dust
+    for (let i = 0; i < Math.round(W * H / 14000); i++) {
+      const dx = wobble(i, 21) * W, dy = wobble(i, 23) * H, dr = 0.8 + wobble(i, 25) * 1.6;
+      ctx.save();
+      ctx.shadowColor = 'rgba(255,200,100,0.9)';
+      ctx.shadowBlur = 6 * k;
+      ctx.fillStyle = 'rgba(255,228,165,0.85)';
+      ctx.beginPath(); ctx.arc(dx, dy, dr, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
+
     // title + footer
+    
     ctx.textAlign = 'center';
     ctx.textBaseline = 'alphabetic';
     ctx.save();
@@ -3063,6 +3093,23 @@ function spawnShootingStar() {
   s.addEventListener('animationend', () => s.remove());
 }
 setInterval(spawnShootingStar, 5500);
+/* cosmic dust: tiny golden specks drifting up through the sky */
+function spawnDust() {
+  if (!skyIsOpen() || !motionOn || document.hidden) return;
+  const d = document.createElement('div');
+  d.className = 'dust';
+  const size = 1.5 + Math.random() * 2.5;
+  d.style.width = size + 'px';
+  d.style.height = size + 'px';
+  d.style.left = (Math.random() * 100) + '%';
+  d.style.setProperty('--dx', ((Math.random() - 0.5) * 120) + 'px');
+  d.style.animationDuration = (12 + Math.random() * 14) + 's';
+  d.style.animationIterationCount = '1';
+  d.style.animationFillMode = 'forwards';
+  sky.appendChild(d);
+  d.addEventListener('animationend', () => d.remove());
+}
+setInterval(spawnDust, 650);
 skyStars.addEventListener('click', e => {
   const b = e.target.closest('.sky-star');
   if (!b) return;
