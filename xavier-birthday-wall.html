@@ -1566,7 +1566,7 @@
     </div>
 
     <label>Your star's sound</label>
-    <p style="margin:-4px 0 8px;font-size:0.78rem;color:rgba(91,84,104,0.6);">Pick a chord for your star. Tap one to hear it. In the night sky, "Notes from the cosmos" plays everyone's chords together.</p>
+    <p style="margin:-4px 0 8px;font-size:0.78rem;color:rgba(91,84,104,0.6);">Pick a chord for your star. Tap one to hear it. Tip: pause the background music first with the ♪ music note button (top-left corner), so you can hear your chord clearly. In the night sky, "Notes from the cosmos" plays everyone's chords together.</p>
     <div class="option-row" id="chordOptions">
       <button class="opt-btn chord-btn" data-chord="warm">Warm</button>
       <button class="opt-btn chord-btn" data-chord="dreamy">Dreamy</button>
@@ -3251,6 +3251,12 @@ function onMusicReady() {
   if (musicStartRequested && musicWanted) playMusicNow();
 }
 
+/* if YouTube refuses to play the video, say so (with its error code) instead of staying silent */
+function onMusicError(e) {
+  console.warn('Background music error', e && e.data);
+  showToast("The background music couldn't load (YouTube error " + (e && e.data) + ").");
+}
+
 function onMusicState(e) {
   if (e.data === 0 && musicWanted) {                   // ended: start again
     try { ytPlayer.seekTo(0); ytPlayer.playVideo(); } catch (err) {}
@@ -3297,7 +3303,7 @@ function startMusicPlayer() {
   document.getElementById('ytMusicHolder').appendChild(iframe);
 
   const makePlayer = () => {
-    ytPlayer = new YT.Player(iframe, { events: { onReady: onMusicReady, onStateChange: onMusicState } });
+    ytPlayer = new YT.Player(iframe, { events: { onReady: onMusicReady, onStateChange: onMusicState, onError: onMusicError } });
   };
   if (window.YT && window.YT.Player) { makePlayer(); return; }
   const prev = window.onYouTubeIframeAPIReady;
@@ -3499,7 +3505,7 @@ function startSong() {
   try { songMusicWas = musicWanted && ytReady && ytPlayer.getPlayerState() === 1; } catch (e) { songMusicWas = false; }
   if (songMusicWas) fadeMusic(MUSIC_VOLUME, 0, 1000, () => { try { ytPlayer.pauseVideo(); } catch (e) {} });
 
-  const start = 2, step = Math.max(0.03, Math.min(1.2, 32 / n));
+  const start = 2, step = Math.max(0.012, Math.min(0.8, 16 / n));   // the stars take about 16 seconds, however many wishes
   startRewind({ start, step });
   clearTimeout(rewindDone);
 
@@ -3509,13 +3515,13 @@ function startSong() {
   songTimers.push(setTimeout(() => skyHub.classList.remove('song-glow'), 3000));
 
   // each star rings its writer's chord, in the order the wishes were written
-  const dense = step < 0.12;
+  const dense = step < 0.2;
   const t0 = performance.now();
   let next = 0;
   songTick = setInterval(() => {
     const s = (performance.now() - t0) / 1000;
     while (next < n && s >= start + next * step) {
-      playChord(cleanNote(skyPts[next].m).chord, 0, { top: dense, vol: dense ? 0.7 : 1 });
+      playChord(cleanNote(skyPts[next].m).chord, 0, { top: dense, vol: dense ? 0.7 : 1, dec: dense ? 1 : 0 });
       next++;
     }
   }, 40);
@@ -3528,7 +3534,7 @@ function startSong() {
     ['warm', 'tender', 'bright', 'dreamy'].forEach(id => playChord(id, 0, { vol: 0.9, dec: 6 }));
     skyTitle.firstChild.textContent = 'Notes from the cosmos you created';
     document.getElementById('skySub').textContent = n + (n === 1 ? ' wish' : ' wishes') + ' made this song';
-    rewindDone = setTimeout(endRewind, 7000);
+    rewindDone = setTimeout(endRewind, 6000);
   }, (start + n * step + 0.8) * 1000));
 }
 
