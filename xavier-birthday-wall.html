@@ -3472,7 +3472,187 @@ async function saveSkySnapshot() {
     }
 
         if (cosmosBg) ctx.drawImage(cosmos, 0, 0, W, H);   // the cosmos behind the stars
+            if (cosmosBg) ctx.drawImage(cosmos, 0, 0, W, H);   // the cosmos behind the stars
+        // the northern-lights glow at the top of the sky
+    {
+      const aw = W * 1.2, ah = H * 0.6, ak = 0.35;   // drawn small, it is only a soft glow
+      const tc = document.createElement('canvas');
+      tc.width = Math.max(1, Math.round(aw * ak));
+      tc.height = Math.max(1, Math.round(ah * ak));
+      const tx = tc.getContext('2d');
+      tx.scale(ak, ak);
+      [[0.60, 0.55, 0.20, 0.30, '80,255,200', 0.20], [0.55, 0.50, 0.55, 0.20, '150,120,255', 0.26], [0.50, 0.55, 0.85, 0.35, '255,120,200', 0.20]]
+        .forEach(([rxp, ryp, cxp, cyp, rgb, a]) => {
+          tx.save();
+          tx.translate(aw * cxp, ah * cyp);
+          tx.scale(aw * rxp, ah * ryp);
+          const ag = tx.createRadialGradient(0, 0, 0, 0, 0, 1);
+          ag.addColorStop(0, `rgba(${rgb},${a})`);
+          ag.addColorStop(0.7, `rgba(${rgb},0)`);
+          ag.addColorStop(1, `rgba(${rgb},0)`);
+          tx.fillStyle = ag;
+          tx.fillRect(-1, -1, 2, 2);
+          tx.restore();
+        });
+      tx.globalCompositeOperation = 'destination-in';   // fades out towards the bottom
+      const fade = tx.createLinearGradient(0, 0, 0, ah);
+      fade.addColorStop(0, 'rgba(0,0,0,1)'); fade.addColorStop(1, 'rgba(0,0,0,0)');
+      tx.fillStyle = fade;
+      tx.fillRect(0, 0, aw, ah);
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = 0.85;   // it gently breathes on screen, this is the middle
+      const ah2 = ah * 1.025;
+      ctx.drawImage(tc, -W * 0.1, -H * 0.06 + (ah - ah2) / 2, aw, ah2);
+      ctx.restore();
+    }
+            // the moon and the planet, copied from the screen
+    {
+      const TAU = Math.PI * 2;
+      const OFF = W + 3000;   // draws only the glow of a shape, never the shape itself
+      const glowOnly = (color, blur, makePath) => {
+        ctx.save();
+        ctx.shadowColor = color;
+        ctx.shadowBlur = blur * k;
+        ctx.shadowOffsetX = OFF * k;
+        ctx.translate(-OFF, 0);
+        ctx.beginPath();
+        makePath();
+        ctx.fillStyle = '#000';
+        ctx.fill();
+        ctx.restore();
+      };
 
+      // moon (top-right corner)
+      const moon = document.getElementById('skyMoon');
+      if (moon && moon.offsetWidth) {
+        const ms = moon.offsetWidth, mcs = getComputedStyle(moon);
+        const mx0 = W - parseFloat(mcs.right) - ms, my0 = parseFloat(mcs.top);
+        const mx = mx0 + ms / 2, my = my0 + ms / 2;
+        glowOnly('rgba(167,139,250,0.14)', 170, () => ctx.arc(mx, my, ms / 2 + 60, 0, TAU));
+        glowOnly('rgba(255,214,120,0.26)', 80, () => ctx.arc(mx, my, ms / 2 + 24, 0, TAU));
+        glowOnly('rgba(255,236,170,0.55)', 26, () => ctx.arc(mx, my, ms / 2 + 6, 0, TAU));
+        ctx.save();
+        ctx.beginPath(); ctx.arc(mx, my, ms / 2, 0, TAU); ctx.clip();
+        const face = ctx.createRadialGradient(mx0 + ms * 0.36, my0 + ms * 0.32, 0, mx0 + ms * 0.36, my0 + ms * 0.32, ms * 0.9338);
+        face.addColorStop(0, '#fffdf0'); face.addColorStop(0.38, '#fff0c4');
+        face.addColorStop(0.72, '#f3d98f'); face.addColorStop(1, '#e2bc66');
+        ctx.fillStyle = face;
+        ctx.fillRect(mx0, my0, ms, ms);
+        // craters: [left, top, gradient size, solid until %, strength]
+        [[0.62, 0.30, 0.9351, 9, 0.42], [0.34, 0.58, 0.8786, 13, 0.36], [0.70, 0.68, 0.9759, 7, 0.32],
+         [0.24, 0.28, 1.0469, 5, 0.28], [0.52, 0.82, 0.9709, 6, 0.26]].forEach(([fx, fy, fr, pct, a]) => {
+          const cx = mx0 + ms * fx, cy = my0 + ms * fy;
+          const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, ms * fr);
+          cg.addColorStop(0, `rgba(214,178,100,${a})`);
+          cg.addColorStop(pct / 100, `rgba(214,178,100,${a})`);
+          cg.addColorStop((pct + 1) / 100, 'rgba(214,178,100,0)');
+          cg.addColorStop(1, 'rgba(214,178,100,0)');
+          ctx.fillStyle = cg;
+          ctx.fillRect(mx0, my0, ms, ms);
+        });
+        const sh = ctx.createRadialGradient(mx0 + ms * 0.72, my0 + ms * 0.78, 0, mx0 + ms * 0.72, my0 + ms * 0.78, ms * 1.0615);
+        sh.addColorStop(0, 'rgba(120,90,170,0.22)');
+        sh.addColorStop(0.62, 'rgba(120,90,170,0)');
+        sh.addColorStop(1, 'rgba(120,90,170,0)');
+        ctx.fillStyle = sh;
+        ctx.fillRect(mx0, my0, ms, ms);
+        ctx.restore();
+      }
+
+      // planet with its ring
+      const planet = document.getElementById('skyPlanet');
+      if (planet && planet.offsetWidth) {
+        const ps = planet.offsetWidth, px0 = planet.offsetLeft, py0 = planet.offsetTop;
+        const pcx = px0 + ps / 2, pcy = py0 + ps / 2;
+        const rx = ps * 1.05, ry = ps * 0.12 + 3, rcy = pcy + 3, tilt = -18 * Math.PI / 180;   // the ring sits 3px lower than the planet's middle
+        glowOnly('rgba(236,120,190,0.35)', 40, () => ctx.arc(pcx, pcy, ps / 2, 0, TAU));
+        ctx.save();
+        ctx.beginPath(); ctx.arc(pcx, pcy, ps / 2, 0, TAU); ctx.clip();
+        const pg = ctx.createRadialGradient(px0 + ps * 0.32, py0 + ps * 0.28, 0, px0 + ps * 0.32, py0 + ps * 0.28, ps * 0.9903);
+        pg.addColorStop(0, '#ffe9f3'); pg.addColorStop(0.38, '#f3a6cf');
+        pg.addColorStop(0.75, '#9a63c9'); pg.addColorStop(1, '#4b2f86');
+        ctx.fillStyle = pg;
+        ctx.fillRect(px0, py0, ps, ps);
+        // soft dark shading on the lower right edge
+        ctx.shadowColor = 'rgba(20,10,60,0.55)';
+        ctx.shadowBlur = 18 * k;
+        ctx.shadowOffsetX = -10 * k;
+        ctx.shadowOffsetY = -8 * k;
+        ctx.beginPath();
+        ctx.rect(px0 - ps, py0 - ps, ps * 3, ps * 3);
+        ctx.moveTo(pcx + ps / 2, pcy);
+        ctx.arc(pcx, pcy, ps / 2, 0, TAU);
+        ctx.fill('evenodd');
+        ctx.restore();
+        // ring glow (only outside the ring), then the ring itself
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(pcx - rx * 2, rcy - rx * 2, rx * 4, rx * 4);
+        ctx.moveTo(pcx + rx * Math.cos(tilt), rcy + rx * Math.sin(tilt));
+        ctx.ellipse(pcx, rcy, rx, ry, tilt, 0, TAU);
+        ctx.clip('evenodd');
+        glowOnly('rgba(255,200,230,0.4)', 14, () => ctx.ellipse(pcx, rcy, rx, ry, tilt, 0, TAU));
+        ctx.restore();
+        ctx.beginPath();
+        ctx.ellipse(pcx, rcy, rx - 1.5, ry - 1.5, tilt, 0, TAU);
+        ctx.strokeStyle = 'rgba(255,225,240,0.55)';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+      }
+    }
+        // the two little orbits around Xavier, and the soft mist over the sky
+    {
+      const TAU = Math.PI * 2;
+      const OFF = W + 3000;
+      const glowOnly = (color, blur, makePath) => {
+        ctx.save();
+        ctx.shadowColor = color;
+        ctx.shadowBlur = blur * k;
+        ctx.shadowOffsetX = OFF * k;
+        ctx.translate(-OFF, 0);
+        ctx.beginPath();
+        makePath();
+        ctx.fillStyle = '#000';
+        ctx.fill();
+        ctx.restore();
+      };
+      const ox = parseFloat(skyHub.style.left), oy = parseFloat(skyHub.style.top);
+      document.querySelectorAll('#skyOrbit i').forEach(el => {
+        const R = el.offsetWidth / 2, cs = getComputedStyle(el);
+        const m = new DOMMatrixReadOnly(cs.transform);
+        const ang = Math.atan2(m.b, m.a);   // where the little light is right now
+        ctx.save();
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 3]);
+        ctx.strokeStyle = cs.borderTopColor;
+        ctx.beginPath(); ctx.arc(ox, oy, R - 0.5, 0, TAU); ctx.stroke();
+        ctx.restore();
+        const dx = ox + (R - 1) * Math.sin(ang), dy = oy - (R - 1) * Math.cos(ang);
+        glowOnly('rgba(255,200,110,0.85)', 10, () => ctx.arc(dx, dy, 6, 0, TAU));
+        ctx.fillStyle = '#fff1d6';
+        ctx.beginPath(); ctx.arc(dx, dy, 3, 0, TAU); ctx.fill();
+      });
+
+      // mist (soft purple and pink clouds)
+      const bw = W * 1.2, bh = H * 1.2, bx = -W * 0.1, by = -H * 0.1;
+      ctx.save();
+      ctx.translate(W / 2, H / 2); ctx.scale(1.04, 1.04); ctx.translate(-W / 2, -H / 2);   // middle of its slow drift
+      [[0.40, 0.30, 0.25, 0.70, '167,139,250', 0.14], [0.35, 0.28, 0.75, 0.30, '244,143,177', 0.12]]
+        .forEach(([rxp, ryp, cxp, cyp, rgb, a]) => {
+          ctx.save();
+          ctx.translate(bx + bw * cxp, by + bh * cyp);
+          ctx.scale(bw * rxp, bh * ryp);
+          const mg = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+          mg.addColorStop(0, `rgba(${rgb},${a})`);
+          mg.addColorStop(0.7, `rgba(${rgb},0)`);
+          mg.addColorStop(1, `rgba(${rgb},0)`);
+          ctx.fillStyle = mg;
+          ctx.fillRect(-1, -1, 2, 2);
+          ctx.restore();
+        });
+      ctx.restore();
+    }
     // constellation lines
     const lp = skyLines.querySelector('path');
     if (lp) {
