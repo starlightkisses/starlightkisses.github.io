@@ -8,7 +8,7 @@
 <meta property="og:description" content="Leave a birthday wish for Xavier and watch it find its place among the stars.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,500;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --navy-deep: #f4f1ee;
@@ -574,6 +574,19 @@
   @keyframes rw-line-in { from { opacity: 0; } to { opacity: 1; } }
   .calm #skyRewind { display: none; }
 
+  /* ---- Notes from the cosmos (constellation song) ---- */
+  .calm #skySong { display: none; }
+  .chord-btn { box-shadow: 0 0 8px rgba(203,185,142,0.4); }
+  .chord-btn.selected { box-shadow: 0 0 14px rgba(232,163,23,0.7); }
+  #skyHub { transition: filter 1s ease; }
+  #skyHub.song-glow { filter: drop-shadow(0 0 26px rgba(255,205,130,0.95)); }
+  #sky.song-flash .sky-star-shape { animation: song-flash 1.3s ease-out 1; }
+  @keyframes song-flash {
+    0% { transform: scale(1); filter: brightness(1); }
+    25% { transform: scale(2.4); filter: brightness(2.2); }
+    100% { transform: scale(1); filter: brightness(1); }
+  }
+
   /* ---- wish lantern: floats up from a freshly pinned note ---- */
   .wish-lantern {
     position: fixed; z-index: 350; width: 24px; height: 32px; margin: -16px 0 0 -12px;
@@ -688,11 +701,12 @@
     border-radius: 3px;
   }
 
-  #hub .hub-label {
+    #hub .hub-label {
     font-family: 'Cormorant Garamond', serif;
     font-style: italic;
-    font-size: 1.3rem;
-    color: #c9a36a;
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: #7a4fb0;
   }
 
   /* sticky notes */
@@ -913,6 +927,33 @@
   }
 
   .cta-side:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(150,130,170,0.3); }
+    /* prettier My Other Works + Ko-Fi buttons */
+  .cta-side {
+    position: relative; overflow: hidden;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    letter-spacing: 0.02em; color: #5b4a86;
+    border: 1.5px solid transparent;
+    background:
+      linear-gradient(160deg, #fffdf8 0%, #f6ecff 100%) padding-box,
+      linear-gradient(135deg, #f5d27a, #c3aee5 50%, #f4a9c0) border-box;
+    box-shadow: 0 6px 16px rgba(150,120,200,0.28), 0 1px 0 rgba(255,255,255,0.95) inset;
+  }
+  a.cta-side:last-child {
+    color: #6a4208;
+    background:
+      linear-gradient(160deg, #fff6d6 0%, #ffe39a 100%) padding-box,
+      linear-gradient(135deg, #f5d27a, #f4a9c0 60%, #c3aee5) border-box;
+    box-shadow: 0 6px 16px rgba(224,169,59,0.38), 0 1px 0 rgba(255,255,255,0.95) inset;
+  }
+  .cta-side::after {
+    content: ""; position: absolute; top: 0; left: -60%; width: 40%; height: 100%;
+    background: linear-gradient(100deg, transparent, rgba(255,255,255,0.75), transparent);
+    transform: skewX(-20deg); pointer-events: none;
+    animation: side-shine 6s ease-in-out infinite;
+  }
+  a.cta-side:last-child::after { animation-delay: 3s; }
+  @keyframes side-shine { 0%, 55% { left: -60%; } 80%, 100% { left: 130%; } }
+  .calm .cta-side::after { animation: none; display: none; }
 
   @media (max-width: 560px) {
     #cta-row {
@@ -1159,23 +1200,36 @@
   #toast.ok { background: #8a76b8; }
 
   /* ============ welcome guide + ? button ============ */
-  #helpBtn {
+    #helpBtn {
     position: fixed; top: 14px; right: 14px; z-index: 90;
-    width: 38px; height: 38px; border-radius: 50%;
+    width: 42px; height: 42px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    background: rgba(255,255,255,0.72);
-    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-    border: 1px solid rgba(203,185,142,0.7);
-    color: #a68a52;
+    border: 2px solid transparent;
+    background:
+      radial-gradient(circle at 35% 28%, #ffffff 0%, #fbf0ff 55%, #f1e3ff 100%) padding-box,
+      linear-gradient(140deg, #f5d27a, #c3aee5 50%, #f4a9c0) border-box;
+    box-shadow: 0 6px 16px rgba(150,120,200,0.35), 0 1px 0 rgba(255,255,255,0.9) inset;
+    color: #8a5fb8; text-shadow: 0 0 8px rgba(245,190,90,0.55);
     font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 600;
-    font-size: 1.35rem; line-height: 1; padding: 0; cursor: pointer;
+    font-size: 1.5rem; line-height: 1; padding: 0; cursor: pointer; outline: none;
     animation: help-pulse 3.5s ease-in-out infinite;
-    transition: transform 0.15s ease, background 0.15s ease;
+    transition: transform 0.15s ease;
   }
-  #helpBtn:hover { transform: scale(1.08); background: #fff; }
+  #helpBtn::after {
+    content: "✦"; position: absolute; top: -6px; right: -5px;
+    font-size: 13px; line-height: 1; font-style: normal; color: #f1c15d;
+    text-shadow: 0 0 8px rgba(245,190,90,0.9);
+    animation: help-twinkle 2.6s ease-in-out infinite;
+  }
+  #helpBtn:hover { transform: scale(1.08); }
+  .calm #helpBtn::after { animation: none; }
   @keyframes help-pulse {
-    0%, 100% { box-shadow: 0 4px 14px rgba(150,130,170,0.25), 0 0 0 0 rgba(232,163,23,0); }
-    50%      { box-shadow: 0 4px 14px rgba(150,130,170,0.25), 0 0 16px 4px rgba(232,163,23,0.35); }
+    0%, 100% { box-shadow: 0 6px 16px rgba(150,120,200,0.35), 0 1px 0 rgba(255,255,255,0.9) inset, 0 0 0 0 rgba(245,190,90,0); }
+    50%      { box-shadow: 0 6px 16px rgba(150,120,200,0.35), 0 1px 0 rgba(255,255,255,0.9) inset, 0 0 18px 5px rgba(245,190,90,0.45); }
+  }
+  @keyframes help-twinkle {
+    0%, 100% { opacity: 0.35; transform: scale(0.7) rotate(0deg); }
+    50%      { opacity: 1; transform: scale(1.15) rotate(20deg); }
   }
 
   #helpOverlay {
@@ -1347,6 +1401,28 @@
     0%, 100% { box-shadow: 0 10px 26px rgba(120,95,165,0.45), 0 2px 0 rgba(255,255,255,0.7) inset, 0 0 0 0 rgba(245,190,90,0); }
     50%      { box-shadow: 0 10px 26px rgba(120,95,165,0.45), 0 2px 0 rgba(255,255,255,0.7) inset, 0 0 22px 5px rgba(245,190,90,0.5); }
   }
+  /* "scroll for more" hint in the welcome box */
+  #helpMore {
+    position: absolute; left: 50%; top: -48px; z-index: 3;
+    transform: translateX(-50%);
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 15px; border-radius: 999px; cursor: pointer; white-space: nowrap;
+    font-family: 'Outfit', sans-serif; font-weight: 500; font-size: 0.8rem; color: #5b4a86;
+    border: 1.5px solid transparent;
+    background:
+      linear-gradient(160deg, #fffdf8, #f1e7ff) padding-box,
+      linear-gradient(135deg, #f5d27a, #c3aee5 55%, #f4a9c0) border-box;
+    box-shadow: 0 8px 20px rgba(120,95,165,0.38), 0 1px 0 rgba(255,255,255,0.9) inset;
+    animation: more-bob 1.6s ease-in-out infinite;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+  #helpMore.gone { opacity: 0; visibility: hidden; pointer-events: none; }
+  @keyframes more-bob {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50%      { transform: translateX(-50%) translateY(5px); }
+  }
+  .calm #helpMore { animation: none; }
+
 
   /* sections fade up one by one as you scroll (only when the browser supports it) */
   #helpCard.rv-on .rv { opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.3, 1); }
@@ -1420,7 +1496,7 @@
 </div>
 
 <div id="cta-row">
-  <a class="cta-side" href="https://starlightkisses.github.io/" target="_blank" rel="noopener">My Other Works</a>
+  <a class="cta-side" href="https://starlightkisses.github.io/" target="_blank" rel="noopener"> ✿ My Other Works</a>
   <button id="cta">✦ Leave a birthday message for Xavier</button>
   <a class="cta-side" href="https://ko-fi.com/starlitbride_" target="_blank" rel="noopener">☕ Ko-Fi</a>
 </div>
@@ -1489,6 +1565,17 @@
       <div class="swatch" data-color="note-sky" style="background:#d3e6f5; border-color:#8fb8d9;"></div>
     </div>
 
+    <label>Your star's sound</label>
+    <p style="margin:-4px 0 8px;font-size:0.78rem;color:rgba(91,84,104,0.6);">Pick a chord for your star. Tap one to hear it. In the night sky, "Notes from the cosmos" plays everyone's chords together.</p>
+    <div class="option-row" id="chordOptions">
+      <button class="opt-btn chord-btn" data-chord="warm">Warm</button>
+      <button class="opt-btn chord-btn" data-chord="dreamy">Dreamy</button>
+      <button class="opt-btn chord-btn" data-chord="bright">Bright</button>
+      <button class="opt-btn chord-btn" data-chord="tender">Tender</button>
+      <button class="opt-btn chord-btn" data-chord="mysterious">Mysterious</button>
+      <button class="opt-btn chord-btn" data-chord="joyful">Joyful</button>
+    </div>
+
     <div class="preview-wrap">
       <div class="note note-cream size-medium" id="previewNote" style="position:relative;transform:rotate(0deg);">
         <canvas class="doodle-cv" id="previewDoodle" width="360" height="240" style="display:none;"></canvas>
@@ -1533,7 +1620,7 @@
   <div id="skyMoon"></div>
   <div id="skyMist"></div>
   <div id="skyTools">
-    <button class="tool-btn" id="skyRewind">✦ Stardust rewind</button>
+    <button class="tool-btn" id="skySong">♪ Notes from the cosmos</button>
     <button class="tool-btn" id="skyShare">Share</button>
     <button class="tool-btn" id="skySnap">📷 Snapshot</button>
     <button class="tool-btn" id="skyClose">← Back to the wall</button>
@@ -1561,8 +1648,9 @@
           <li><strong>Write</strong> a message of up to <strong>180 characters</strong>, or</li>
           <li><strong>Doodle</strong> it by drawing with your finger. You can change the color and thickness, and undo or clear.</li>
           <li>Then pick your note's <strong>size, tilt and color</strong>. A preview shows how it'll look.</li>
+          <li>Choose <strong>your star's sound</strong>, a little chord that your star rings in the night sky. Tap one to hear it first.</li>
         </ul>
-        <p>Add your name and tap <span class="chip">Pin it to the wall</span> and it will fly into place automatically ♡</p>
+        <p>Add your name and tap <span class="chip">Pin it to the wall</span> and it will fly into place randomly ♡</p>
       </section>
 
       <div class="hbox cream rv">
@@ -1590,7 +1678,8 @@
       <section class="hsec rv">
         <h3><span class="gl">.✦ ݁˖</span> Night sky 🌌</h3>
         <p>Tap on <span class="chip">✦ Constellation</span> to turn the wall into a starry sky. Every wish you see on the wall, becomes a <strong>golden star</strong>, joining into a constellation around our Xavier. If you tap a star you can read its wish.</p>
-        <p>Inside the night sky, tap <span class="chip">✦ Stardust rewind</span> to watch every star light up again, one by one, from the very first wish to the newest. The counter at the top counts up as they appear.</p>
+        <p>Inside the night sky, tap <span class="chip">♪ Notes from the cosmos</span> to hear the sky sing. The background music gently pauses, then every star lights up one by one, from the very first wish to the newest, and rings the sound its writer chose. At the end they all shine together, and the music comes back. Tap <span class="chip">■ Stop</span> any time to end it early.</p>
+        <p>If you wrote a wish on this device, tap your own star in the night sky to hear your sound ♪</p>
       </section>
 
       <section class="hsec rv">
@@ -1622,6 +1711,7 @@
     </div>
 
     <div id="helpFoot">
+            <button id="helpMore" type="button" aria-label="Scroll down for more">✦ Scroll for more ↓</button>
       <button id="helpGo" type="button">✦ Let's go</button>
     </div>
   </div>
@@ -1693,6 +1783,7 @@ function cleanNote(m) {
     size:  ALLOWED_SIZES.includes(m.size) ? m.size : 'medium',
     icon:  NOTE_ICONS.includes(m.icon) ? m.icon : NOTE_ICONS[0],
     angle: Math.max(-15, Math.min(15, Number(m.angle) || 0)),
+    chord: CHORDS[m.chord] ? m.chord : autoChord(m),
     doodle: cleanDoodle(m.doodle)
   };
 }
@@ -2567,8 +2658,8 @@ async function saveSnapshot() {
     if (cardImg) ctx.drawImage(cardImg, px + 8, py + 8, pw - 16, ph - 16);
 
     const lr = hub.querySelector('.hub-label').getBoundingClientRect();
-    ctx.font = 'italic 400 20.8px "Cormorant Garamond", serif';
-    ctx.fillStyle = '#c9a36a';
+    ctx.font = 'italic 600 24px "Cormorant Garamond", serif';
+    ctx.fillStyle = '#7a4fb0';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(hub.querySelector('.hub-label').textContent,
@@ -2784,7 +2875,7 @@ function findBannedMatch(text){
   return null;
 }
 
-let state = { size: 'medium', angle: 0, color: 'note-cream', mode: 'write' };
+let state = { size: 'medium', angle: 0, color: 'note-cream', mode: 'write', chord: '' };
 
 /* doodle pad */
 let padStrokes = [];
@@ -2976,6 +3067,7 @@ submitBtn.addEventListener('click', () => {
     size: state.size,
     angle: state.angle,
     color: state.color,
+    chord: state.chord,
     icon: NOTE_ICONS[Math.floor(Math.random() * NOTE_ICONS.length)],
     x: 0,
     y: 0,
@@ -3253,23 +3345,24 @@ function endRewind() {
   sky.classList.remove('rewinding');
   skyLines.querySelectorAll('.rw-line').forEach(l => l.remove());
   skyTitle.firstChild.textContent = skyTitleText(skyPts.length);
-  document.getElementById('skyRewind').disabled = false;
+  document.getElementById('skySong').disabled = false;
+  endSong();
 }
 
 /* Stardust rewind: every star lights up again in the order the wishes were written,
    the lines draw themselves, and the counter at the top counts up. */
-function startRewind() {
+function startRewind(o) {
   const n = skyPts.length;
   if (rewinding || n === 0 || !motionOn) return;
   rewinding = true;
-  document.getElementById('skyRewind').disabled = true;
+  document.getElementById('skySong').disabled = !o;
 
   // start the view on Xavier, where the oldest wishes are
   sky.scrollLeft = Math.max(0, (skyWorld.offsetWidth - sky.clientWidth) / 2);
   sky.scrollTop = Math.max(0, (skyWorld.offsetHeight - sky.clientHeight) / 2);
 
-  const start = 0.5;                                        // seconds before the first star
-  const step = Math.max(0.025, Math.min(0.3, 12 / n));      // about 12 seconds in total for big skies
+  const start = o ? o.start : 0.5;                                        // seconds before the first star
+  const step = o ? o.step : Math.max(0.025, Math.min(0.3, 12 / n));      // about 12 seconds in total for big skies
   skyStars.querySelectorAll('.sky-star').forEach((b, i) => b.style.setProperty('--rw', (start + i * step) + 's'));
 
   // each line appears together with the newer of its two stars
@@ -3294,7 +3387,174 @@ function startRewind() {
   rewindDone = setTimeout(endRewind, (start + n * step + 1.4) * 1000);
 }
 
-document.getElementById('skyRewind').addEventListener('click', startRewind);
+
+/* ============================================================
+   NOTES FROM THE COSMOS — every wish rings the chord its writer picked.
+   All chords come from one pentatonic scale (C D E G A), so any mix
+   of them sounds gentle together. Sounds are made inside the page.
+   ============================================================ */
+const CHORDS = {
+  warm:       { n: [-12, -5, 4],  g: 0.55, dec: 2.6, echo: 0.18 },
+  dreamy:     { n: [2, 9, 16],    g: 0.42, dec: 3.6, echo: 0.38 },
+  bright:     { n: [12, 16, 19],  g: 0.32, dec: 1.8, echo: 0.20 },
+  tender:     { n: [-3, 4, 7],    g: 0.50, dec: 2.4, echo: 0.22 },
+  mysterious: { n: [-5, 2, 9],    g: 0.50, dec: 3.6, echo: 0.40 },
+  joyful:     { n: [7, 14, 21],   g: 0.30, dec: 1.6, echo: 0.18 }
+};
+const CHORD_IDS = Object.keys(CHORDS);
+function autoChord(m) {   // wishes without a chosen chord still join in
+  let h = 0;
+  const t = String(m.name || '') + '|' + String(m.ts || '');
+  for (let i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) >>> 0;
+  return CHORD_IDS[h % CHORD_IDS.length];
+}
+
+let actx = null, masterGain = null, echoIn = null, voices = 0;
+/* chord previews must never knock the background music off: if it stopped, start it again */
+function keepMusicGoing() {
+  try {
+    if (songOn || !musicWanted || !musicStartRequested || !ytReady || document.hidden) return;
+    const st = ytPlayer.getPlayerState();
+    if (st !== 1 && st !== 3) playMusicNow();
+  } catch (e) {}
+}
+
+function audioCtx() {
+  if (!actx) {
+    try { if (navigator.audioSession) navigator.audioSession.type = 'ambient'; } catch (e) {}   // let it mix with the background music
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    actx = new AC();
+    masterGain = actx.createGain(); masterGain.gain.value = 0.5;
+    const comp = actx.createDynamicsCompressor();
+    masterGain.connect(comp); comp.connect(actx.destination);
+    echoIn = actx.createGain();
+    const dl = actx.createDelay(1); dl.delayTime.value = 0.32;
+    const fb = actx.createGain(); fb.gain.value = 0.38;
+    echoIn.connect(dl); dl.connect(fb); fb.connect(dl); dl.connect(masterGain);
+  }
+  if (actx.state === 'suspended') actx.resume();
+  return actx;
+}
+
+/* one soft bell-like chord; opt.top = only the highest note (keeps big skies light) */
+function playChord(id, delay, opt) {
+  opt = opt || {};
+  const c = audioCtx(); if (!c) return;
+  const ch = CHORDS[id] || CHORDS.warm;
+  const notes = opt.top ? [ch.n[ch.n.length - 1]] : ch.n;
+  const vol = (opt.vol || 1) * ch.g / Math.sqrt(notes.length);
+  const dec = opt.dec || ch.dec;
+  const t = c.currentTime + (delay || 0) + 0.02;
+  if (!songOn) setTimeout(keepMusicGoing, 400);
+  notes.forEach((semi, i) => {
+    if (voices >= 28) return;   // never pile up into noise
+    voices++;
+    const f = 261.63 * Math.pow(2, semi / 12), st = t + i * 0.045;
+    const o = c.createOscillator(), o2 = c.createOscillator();
+    const g = c.createGain(), g2 = c.createGain(), send = c.createGain();
+    o.type = 'sine'; o.frequency.value = f;
+    o2.type = 'sine'; o2.frequency.value = f * 2.01; g2.gain.value = 0.18;
+    g.gain.setValueAtTime(0.0001, st);
+    g.gain.linearRampToValueAtTime(vol * 0.5, st + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, st + dec);
+    send.gain.value = ch.echo;
+    o.connect(g); o2.connect(g2); g2.connect(g);
+    g.connect(masterGain); g.connect(send); send.connect(echoIn);
+    o.start(st); o2.start(st); o.stop(st + dec + 0.1); o2.stop(st + dec + 0.1);
+    o.onended = () => { voices--; };
+  });
+}
+
+/* pick a chord in the form: plays right away so people can hear it */
+document.getElementById('chordOptions').addEventListener('click', e => {
+  const id = e.target.dataset && e.target.dataset.chord;
+  if (!id) return;
+  state.chord = id;
+  document.querySelectorAll('#chordOptions .chord-btn').forEach(b => b.classList.toggle('selected', b === e.target));
+  playChord(id, 0);
+});
+
+/* the song: background music fades out, stars ring in order, music comes back */
+let songOn = false, songTick = 0, songTimers = [], songMusicWas = false, fadeT = 0;
+const skySong = document.getElementById('skySong');
+
+function fadeMusic(from, to, ms, done) {
+  clearInterval(fadeT);
+  if (!ytReady) { if (done) done(); return; }
+  let k = 0;
+  fadeT = setInterval(() => {
+    k++;
+    try { ytPlayer.setVolume(Math.round(from + (to - from) * k / 10)); } catch (e) {}
+    if (k >= 10) { clearInterval(fadeT); if (done) done(); }
+  }, ms / 10);
+}
+
+function startSong() {
+  const n = skyPts.length;
+  if (rewinding || n === 0 || !motionOn || !audioCtx()) return;
+  songOn = true;
+  skySong.textContent = '■ Stop';
+
+  try { songMusicWas = musicWanted && ytReady && ytPlayer.getPlayerState() === 1; } catch (e) { songMusicWas = false; }
+  if (songMusicWas) fadeMusic(MUSIC_VOLUME, 0, 1000, () => { try { ytPlayer.pauseVideo(); } catch (e) {} });
+
+  const start = 2, step = Math.max(0.03, Math.min(1.2, 32 / n));
+  startRewind({ start, step });
+  clearTimeout(rewindDone);
+
+  // Xavier glows with a warm low chord first
+  skyHub.classList.add('song-glow');
+  playChord('warm', 0.3, { vol: 1.1, dec: 4 });
+  songTimers.push(setTimeout(() => skyHub.classList.remove('song-glow'), 3000));
+
+  // each star rings its writer's chord, in the order the wishes were written
+  const dense = step < 0.12;
+  const t0 = performance.now();
+  let next = 0;
+  songTick = setInterval(() => {
+    const s = (performance.now() - t0) / 1000;
+    while (next < n && s >= start + next * step) {
+      playChord(cleanNote(skyPts[next].m).chord, 0, { top: dense, vol: dense ? 0.7 : 1 });
+      next++;
+    }
+  }, 40);
+
+  // finale: every star flashes, a long chord rings, the title says what happened
+  songTimers.push(setTimeout(() => {
+    clearInterval(songTick);
+    clearInterval(rewindTick);
+    sky.classList.add('song-flash');
+    ['warm', 'tender', 'bright', 'dreamy'].forEach(id => playChord(id, 0, { vol: 0.9, dec: 6 }));
+    skyTitle.firstChild.textContent = 'Notes from the cosmos you created';
+    document.getElementById('skySub').textContent = n + (n === 1 ? ' wish' : ' wishes') + ' made this song';
+    rewindDone = setTimeout(endRewind, 7000);
+  }, (start + n * step + 0.8) * 1000));
+}
+
+function endSong() {
+  if (!songOn) return;
+  songOn = false;
+  clearInterval(songTick);
+  songTimers.forEach(clearTimeout); songTimers = [];
+  sky.classList.remove('song-flash');
+  skyHub.classList.remove('song-glow');
+  document.getElementById('skySub').textContent = 'Tap a star to read its wish';
+  skySong.textContent = '♪ Notes from the cosmos';
+  if (masterGain) {   // let any ringing notes fade quickly if the song was stopped early
+    masterGain.gain.setTargetAtTime(0, actx.currentTime, 0.12);
+    setTimeout(() => { masterGain.gain.cancelScheduledValues(actx.currentTime); masterGain.gain.value = 0.5; }, 700);
+  }
+  clearInterval(fadeT);
+  try {
+    if (songMusicWas && musicWanted) { ytPlayer.setVolume(0); ytPlayer.playVideo(); fadeMusic(0, MUSIC_VOLUME, 1500); }
+    else ytPlayer.setVolume(MUSIC_VOLUME);   // music stays off if the visitor had turned it off
+  } catch (e) {}
+  songMusicWas = false;
+}
+
+skySong.addEventListener('click', () => { if (songOn) endRewind(); else startSong(); });
+
 
 function buildSky() {
   endRewind();
@@ -3947,6 +4207,7 @@ setInterval(() => { if (Math.random() < 0.4) setTimeout(spawnShootingStar, 350);
 skyStars.addEventListener('click', e => {
   const b = e.target.closest('.sky-star');
   if (!b) return;
+  if (myTokens[b.dataset.key] && !songOn) { const mm = findMsg(b.dataset.key); if (mm) playChord(cleanNote(mm).chord, 0); }   // your own star rings your chord
   const note = Array.from(wall.querySelectorAll('.note')).find(x => x.dataset.key === b.dataset.key);
   if (note) showBig(note);
 });
@@ -4099,6 +4360,15 @@ const helpBtn = document.getElementById('helpBtn');
 const helpScroll = document.getElementById('helpScroll');
 const helpSparks = document.getElementById('helpSparks');
 const rvEls = Array.from(helpCard.querySelectorAll('.rv'));
+/* "scroll for more" pill: shows until the reader has almost reached the bottom */
+const helpMore = document.getElementById('helpMore');
+function updateHelpMore() {
+  const left = helpScroll.scrollHeight - helpScroll.scrollTop - helpScroll.clientHeight;
+  helpMore.classList.toggle('gone', left < 40);
+}
+helpScroll.addEventListener('scroll', updateHelpMore, { passive: true });
+window.addEventListener('resize', updateHelpMore);
+helpMore.addEventListener('click', () => helpScroll.scrollBy({ top: helpScroll.clientHeight * 0.7, behavior: 'smooth' }));
 
 /* sparkles that float up inside the card */
 if (motionOn) {
@@ -4153,6 +4423,8 @@ function openHelp() {
   helpOverlay.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
   helpScroll.scrollTop = 0;
+  updateHelpMore();
+  setTimeout(updateHelpMore, 500);   // once more after the fonts have loaded
   resetReveal();
   fitHelpTitle();
   document.getElementById('helpGo').focus();
