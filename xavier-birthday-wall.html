@@ -560,6 +560,65 @@
     color: #a68a52; font-size: 1.15rem; line-height: 1; padding: 0; cursor: pointer;
     transition: transform 0.15s ease, background 0.15s ease, opacity 0.2s ease;
   }
+
+  /* ---- Stardust rewind: the stars light up again, oldest first ---- */
+  #sky.rewinding .sky-star {
+    animation: star-in 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+    animation-delay: var(--rw, 0s);
+  }
+  #sky.rewinding #skyLines path { opacity: 0; animation: none; }
+  .rw-line {
+    fill: none; stroke: rgba(255,210,130,0.45); stroke-width: 0.9; stroke-linecap: round;
+    opacity: 0; animation: rw-line-in 0.9s ease-out both; animation-delay: var(--rw, 0s);
+  }
+  @keyframes rw-line-in { from { opacity: 0; } to { opacity: 1; } }
+  .calm #skyRewind { display: none; }
+
+  /* ---- wish lantern: floats up from a freshly pinned note ---- */
+  .wish-lantern {
+    position: fixed; z-index: 350; width: 24px; height: 32px; margin: -16px 0 0 -12px;
+    pointer-events: none; border-radius: 8px 8px 11px 11px / 10px 10px 13px 13px;
+    background: linear-gradient(180deg, #fff1bf 0%, #ffc561 55%, #ff9d3a 100%);
+    box-shadow: 0 0 16px 5px rgba(255,190,90,0.65), 0 0 46px 14px rgba(255,170,70,0.32);
+    animation: lantern-rise 7s ease-in forwards, lantern-flicker 0.9s ease-in-out infinite alternate;
+  }
+  .wish-lantern::before, .wish-lantern::after {
+    content: ""; position: absolute; left: 4px; right: 4px; height: 4px; border-radius: 2px;
+    background: #b98a45;
+  }
+  .wish-lantern::before { top: -3px; }
+  .wish-lantern::after  { bottom: -3px; }
+  @keyframes lantern-rise {
+    0%   { opacity: 0; transform: translate(0, 0) scale(0.6); }
+    8%   { opacity: 1; }
+    35%  { transform: translate(calc(var(--sway, 24px) * -1), -24vh) scale(0.85); }
+    65%  { opacity: 0.95; transform: translate(var(--sway, 24px), -52vh) scale(0.7); }
+    100% { opacity: 0; transform: translate(0, -85vh) scale(0.4); }
+  }
+  @keyframes lantern-flicker { from { filter: brightness(0.9); } to { filter: brightness(1.15); } }
+
+  /* ---- milestone card ---- */
+  #milestone {
+    position: fixed; left: 50%; top: 16%; z-index: 330; transform: translateX(-50%);
+    width: min(86vw, 340px); text-align: center; padding: 22px 22px 18px; cursor: pointer;
+    background: linear-gradient(180deg, #fffaf0, #fdf1f4);
+    border: 1px solid rgba(203,185,142,0.85); border-radius: 18px;
+    box-shadow: 0 10px 40px rgba(150,120,170,0.35), 0 0 60px rgba(255,214,140,0.5);
+    animation: milestone-in 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+  }
+  #milestone.out { animation: milestone-out 0.5s ease forwards; }
+  @keyframes milestone-in  { from { opacity: 0; transform: translateX(-50%) translateY(-18px) scale(0.85); } }
+  @keyframes milestone-out { to   { opacity: 0; transform: translateX(-50%) translateY(-12px) scale(0.95); } }
+  #milestone .ms-num {
+    font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 600;
+    font-size: 3.2rem; line-height: 1; color: #c9a36a; text-shadow: 0 0 18px rgba(255,200,110,0.6);
+  }
+  #milestone .ms-head {
+    font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 600;
+    font-size: 1.35rem; color: #4a4356; margin-top: 6px;
+  }
+  #milestone .ms-sub { font-size: 0.85rem; color: #5b5468; margin-top: 6px; }
+
   #musicBtn:hover { transform: translateY(-1px); background: #ffffff; }
   #musicBtn.off { opacity: 0.6; }
   #musicBtn.off::after {
@@ -1474,6 +1533,7 @@
   <div id="skyMoon"></div>
   <div id="skyMist"></div>
   <div id="skyTools">
+    <button class="tool-btn" id="skyRewind">✦ Stardust rewind</button>
     <button class="tool-btn" id="skyShare">Share</button>
     <button class="tool-btn" id="skySnap">📷 Snapshot</button>
     <button class="tool-btn" id="skyClose">← Back to the wall</button>
@@ -1530,6 +1590,12 @@
       <section class="hsec rv">
         <h3><span class="gl">.✦ ݁˖</span> Night sky 🌌</h3>
         <p>Tap on <span class="chip">✦ Constellation</span> to turn the wall into a starry sky. Every wish you see on the wall, becomes a <strong>golden star</strong>, joining into a constellation around our Xavier. If you tap a star you can read its wish.</p>
+        <p>Inside the night sky, tap <span class="chip">✦ Stardust rewind</span> to watch every star light up again, one by one, from the very first wish to the newest. The counter at the top counts up as they appear.</p>
+      </section>
+
+      <section class="hsec rv">
+        <h3><span class="gl">.✦ ݁˖</span> Music ♪</h3>
+        <p>Soft music starts playing when you close this box with <span class="chip">✦ Let's go</span>. If you'd like quiet, tap the little <span class="chip">♪</span> button in the top-left corner to turn it off, and tap it again to bring the music back.</p>
       </section>
 
       <div class="hbox purple rv">
@@ -1560,7 +1626,7 @@
     </div>
   </div>
 </div>
-<button id="musicBtn" type="button" aria-pressed="true" aria-label="Pause the music" title="Pause the music">♪</button>
+<button id="musicBtn" type="button" aria-pressed="true" aria-label="Turn the music off" title="Turn the music off">♪</button>
 <div id="ytMusicHolder" aria-hidden="true"></div>
 
 <div id="lightbox"></div>
@@ -1985,12 +2051,25 @@ function glowNote(el) {
   el.addEventListener('animationend', () => el.classList.remove('note-found'), { once: true });
 }
 
+/* a little lantern floats up from a freshly pinned note and fades into the sky */
+function releaseLantern(x, y) {
+  if (!motionOn) return;
+  const l = document.createElement('div');
+  l.className = 'wish-lantern';
+  l.style.left = x + 'px';
+  l.style.top = y + 'px';
+  l.style.setProperty('--sway', (18 + Math.random() * 26) + 'px');
+  document.body.appendChild(l);
+  l.addEventListener('animationend', e => { if (e.animationName === 'lantern-rise') l.remove(); });
+}
+
 function focusNote(el, celebrate) {
   el.scrollIntoView({ behavior: motionOn ? 'smooth' : 'auto', block: 'center', inline: 'center' });
   if (celebrate) {
     setTimeout(() => {
       const r = el.getBoundingClientRect();
       burst(r.left + r.width / 2, r.top + r.height / 2, 32);
+      releaseLantern(r.left + r.width / 2, r.top + r.height / 2);
     }, 700);
   }
 }
@@ -2107,6 +2186,7 @@ function drawWall(messages, opts = {}) {
   }
 
   if (focusEl) focusNote(focusEl, opts.celebrate);
+  checkMilestone();
   if (skyIsOpen()) buildSky();   // keep the night sky up to date
 }
 
@@ -3038,75 +3118,60 @@ editDelete.addEventListener('click', () => {
 
 /* ============================================================
    BACKGROUND MUSIC — the sound of a YouTube video, played by a tiny
-   hidden player. Browsers never allow sound before the visitor has
-   tapped or clicked once, so the music tries to start as soon as the
-   page opens, and if the browser says no it starts at the visitor's
-   first tap / click (usually the "Let's go" button).
+   hidden player. It starts when the visitor closes the welcome box
+   ("Let's go", the X, or a tap outside the box). The little note
+   button in the top-left corner turns it off and on.
    ============================================================ */
 const MUSIC_VIDEO_ID = 'yQTbK4H9rSE';
 const MUSIC_VOLUME   = 60;                 // 0 - 100
 
 const musicBtn = document.getElementById('musicBtn');
 let ytPlayer = null, ytReady = false;
-let musicWanted = true;                    // becomes false if the visitor pauses it
-let musicUnlocked = false;                 // becomes true after the first tap / click
+let musicWanted = true;                    // becomes false if the visitor turns it off
+let musicStartRequested = false;           // becomes true when the welcome box is closed
 let resumeAfterHidden = false;
-
-const MUSIC_EVENTS = ['pointerdown', 'touchend', 'click', 'keydown'];
 
 function showMusicState(on) {
   musicBtn.classList.toggle('off', !on);
   musicBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
-  musicBtn.setAttribute('aria-label', on ? 'Pause the music' : 'Play the music');
-  musicBtn.title = on ? 'Pause the music' : 'Play the music';
+  musicBtn.setAttribute('aria-label', on ? 'Turn the music off' : 'Turn the music on');
+  musicBtn.title = on ? 'Turn the music off' : 'Turn the music on';
 }
 
-function musicIsSounding() {
-  try { return ytReady && ytPlayer.getPlayerState() === 1 && !ytPlayer.isMuted(); } catch (e) { return false; }
+function playMusicNow() {
+  try { ytPlayer.setVolume(MUSIC_VOLUME); ytPlayer.unMute(); ytPlayer.playVideo(); } catch (e) {}
 }
 
-function stopWaitingForTap() {
-  MUSIC_EVENTS.forEach(e => document.removeEventListener(e, firstTapMusic, true));
-}
-
-function firstTapMusic(e) {
-  if (e.target && e.target.closest && e.target.closest('#musicBtn')) return;
-  musicUnlocked = true;
-  if (!ytReady || !musicWanted) return;
-  try { ytPlayer.unMute(); ytPlayer.setVolume(MUSIC_VOLUME); ytPlayer.playVideo(); } catch (err) {}
-  setTimeout(() => { if (musicIsSounding()) stopWaitingForTap(); }, 1200);
-}
-MUSIC_EVENTS.forEach(e => document.addEventListener(e, firstTapMusic, true));
-
-function onMusicReady() {
-  ytReady = true;
-  try {
-    ytPlayer.setVolume(MUSIC_VOLUME);
-    if (musicUnlocked) ytPlayer.unMute();
-    ytPlayer.playVideo();
-  } catch (e) {}
-  // if the browser refused to play with sound, let it run silently, so the sound
-  // comes in the very moment the visitor first taps
-  setTimeout(() => {
-    if (!musicWanted || musicUnlocked) return;
-    try { if (ytPlayer.getPlayerState() !== 1) { ytPlayer.mute(); ytPlayer.playVideo(); } } catch (e) {}
+// called when the welcome box is closed (only the first time does anything)
+function startMusic() {
+  if (musicStartRequested) return;
+  musicStartRequested = true;
+  if (!musicWanted || !ytReady) return;      // if the player is still loading, onMusicReady starts it
+  playMusicNow();
+  setTimeout(() => {                         // one more try if the browser didn't start it
+    try { if (musicWanted && ytPlayer.getPlayerState() !== 1) playMusicNow(); } catch (e) {}
   }, 1500);
 }
 
+function onMusicReady() {
+  ytReady = true;
+  try { ytPlayer.setVolume(MUSIC_VOLUME); } catch (e) {}
+  if (musicStartRequested && musicWanted) playMusicNow();
+}
+
 function onMusicState(e) {
-  if (e.data === 0) {                                  // ended: start again
+  if (e.data === 0 && musicWanted) {                   // ended: start again
     try { ytPlayer.seekTo(0); ytPlayer.playVideo(); } catch (err) {}
   }
-  if (e.data === 1 && musicIsSounding()) stopWaitingForTap();
 }
 
 musicBtn.addEventListener('click', () => {
-  musicUnlocked = true;
   musicWanted = !musicWanted;
   showMusicState(musicWanted);
+  if (musicWanted) musicStartRequested = true;
   if (!ytReady) return;
   try {
-    if (musicWanted) { ytPlayer.unMute(); ytPlayer.setVolume(MUSIC_VOLUME); ytPlayer.playVideo(); }
+    if (musicWanted) playMusicNow();
     else ytPlayer.pauseVideo();
   } catch (e) {}
 });
@@ -3127,7 +3192,7 @@ document.addEventListener('visibilitychange', () => {
 
 function startMusicPlayer() {
   const q = new URLSearchParams({
-    enablejsapi: '1', autoplay: '1', controls: '0', loop: '1', playlist: MUSIC_VIDEO_ID,
+    enablejsapi: '1', autoplay: '0', controls: '0', loop: '1', playlist: MUSIC_VIDEO_ID,
     playsinline: '1', rel: '0', modestbranding: '1', disablekb: '1', fs: '0'
   });
   if (location.protocol === 'http:' || location.protocol === 'https:') q.set('origin', location.origin);
@@ -3171,7 +3236,68 @@ let skyTimer;
 
 function skyIsOpen() { return sky.classList.contains('open'); }
 
+let skyPts = [], skyEdges = [];
+let rewinding = false, rewindDone = 0, rewindTick = 0;
+
+function skyTitleText(n) {
+  return n === 0
+    ? 'The sky is waiting for its first star'
+    : countText(n).replace('have left a wish', 'have lit up the sky').replace('has left a wish', 'has lit up the sky');
+}
+
+function endRewind() {
+  if (!rewinding) return;
+  rewinding = false;
+  clearTimeout(rewindDone);
+  clearInterval(rewindTick);
+  sky.classList.remove('rewinding');
+  skyLines.querySelectorAll('.rw-line').forEach(l => l.remove());
+  skyTitle.firstChild.textContent = skyTitleText(skyPts.length);
+  document.getElementById('skyRewind').disabled = false;
+}
+
+/* Stardust rewind: every star lights up again in the order the wishes were written,
+   the lines draw themselves, and the counter at the top counts up. */
+function startRewind() {
+  const n = skyPts.length;
+  if (rewinding || n === 0 || !motionOn) return;
+  rewinding = true;
+  document.getElementById('skyRewind').disabled = true;
+
+  // start the view on Xavier, where the oldest wishes are
+  sky.scrollLeft = Math.max(0, (skyWorld.offsetWidth - sky.clientWidth) / 2);
+  sky.scrollTop = Math.max(0, (skyWorld.offsetHeight - sky.clientHeight) / 2);
+
+  const start = 0.5;                                        // seconds before the first star
+  const step = Math.max(0.025, Math.min(0.3, 12 / n));      // about 12 seconds in total for big skies
+  skyStars.querySelectorAll('.sky-star').forEach((b, i) => b.style.setProperty('--rw', (start + i * step) + 's'));
+
+  // each line appears together with the newer of its two stars
+  const NS = 'http://www.w3.org/2000/svg';
+  skyEdges.forEach(([a, b]) => {
+    const l = document.createElementNS(NS, 'line');
+    l.setAttribute('class', 'rw-line');
+    l.setAttribute('x1', skyPts[a].x.toFixed(1)); l.setAttribute('y1', skyPts[a].y.toFixed(1));
+    l.setAttribute('x2', skyPts[b].x.toFixed(1)); l.setAttribute('y2', skyPts[b].y.toFixed(1));
+    l.style.setProperty('--rw', (start + Math.max(a, b) * step) + 's');
+    skyLines.appendChild(l);
+  });
+
+  sky.classList.add('rewinding');
+  skyTitle.firstChild.textContent = skyTitleText(0);
+  const t0 = performance.now();
+  rewindTick = setInterval(() => {
+    const s = (performance.now() - t0) / 1000;
+    const k = s < start ? 0 : Math.min(n, Math.floor((s - start) / step) + 1);
+    skyTitle.firstChild.textContent = skyTitleText(k);
+  }, 90);
+  rewindDone = setTimeout(endRewind, (start + n * step + 1.4) * 1000);
+}
+
+document.getElementById('skyRewind').addEventListener('click', startRewind);
+
 function buildSky() {
+  endRewind();
   const VW = sky.clientWidth, VH = sky.clientHeight;      // what the screen shows
   const list = cachedMessages.slice().sort((a, b) => (Number(a.ts) || 0) - (Number(b.ts) || 0));
   const n = list.length;
@@ -3195,7 +3321,7 @@ function buildSky() {
   skyLines.innerHTML = '';
   skyHub.style.left = cx + 'px';
   skyHub.style.top = cy + 'px';
-  skyTitle.firstChild.textContent = n === 0 ? 'The sky is waiting for its first star' : countText(n).replace('have left a wish', 'have lit up the sky').replace('has left a wish', 'has lit up the sky');
+  skyTitle.firstChild.textContent = skyTitleText(n);
 
   // sunflower-style spread, oldest wishes next to Xavier: even, with a tiny wobble
   const pts = list.map((m, i) => {
@@ -3206,6 +3332,7 @@ function buildSky() {
   });
 
   // shortest lines that link every star (a minimum spanning tree)
+  const edges = [];
   if (n > 1) {
     const inTree = new Array(n).fill(false);
     const dist = new Array(n).fill(Infinity);
@@ -3217,6 +3344,7 @@ function buildSky() {
       for (let i = 0; i < n; i++) if (!inTree[i] && (u < 0 || dist[i] < dist[u])) u = i;
       inTree[u] = true;
       if (from[u] >= 0) {
+        edges.push([from[u], u]);
         const a = pts[from[u]];
         d += `M${a.x.toFixed(1)} ${a.y.toFixed(1)}L${pts[u].x.toFixed(1)} ${pts[u].y.toFixed(1)}`;
       }
@@ -3264,6 +3392,8 @@ function buildSky() {
   });
   skyStars.appendChild(frag);
 
+  skyPts = pts; skyEdges = edges;   // kept for the Stardust rewind
+
   // if the sky got bigger or smaller, repaint the cosmos behind it to match
   const sizeChanged = (W !== skyBuiltW || H !== skyBuiltH);
   skyBuiltW = W; skyBuiltH = H;
@@ -3285,6 +3415,7 @@ function openSky() {
 }
 
 function closeSky() {
+  endRewind();
   sky.classList.remove('open');
   sky.setAttribute('aria-hidden', 'true');
   document.body.style.overflow = '';
@@ -3706,17 +3837,65 @@ function updateBirthdayUI() {
   const bday = new Date(now.getFullYear(), BIRTHDAY.month - 1, BIRTHDAY.day);
   const days = Math.round((bday - today) / 86400000);
 
+  // only the birthday itself is announced; no countdown on the other days
   bl.style.display = days === 0 ? 'block' : 'none';
-  if (days > 0) {
-    cl.textContent = days === 1
-      ? "1 day until Xavier's birthday"
-      : `${days} days until Xavier's birthday`;
-    cl.style.display = 'block';
-  } else {
-    cl.style.display = 'none';
-  }
-  dot.style.display = days >= 0 ? 'block' : 'none';
+  cl.style.display = 'none';
+  dot.style.display = days === 0 ? 'block' : 'none';
   return days;
+}
+
+/* ============================================================
+   MILESTONES — a small celebration at 50, 100 and 200 wishes.
+   Each visitor sees each one only once.
+   ============================================================ */
+
+const MILESTONES = {
+  50:  { head: '50 stars and counting ✦', sub: "Xavier's sky is glowing." },
+  100: { head: '100 little stars! ✦',     sub: 'A hundred wishes for one very loved prince.' },
+  200: { head: '200 wishes shining ✦',    sub: 'Look how much love fits in one sky.' }
+};
+const MILESTONE_KEY = 'wos_milestones_seen';
+let milestoneWaiting = false;
+const milestoneSeenNow = new Set();
+
+function showMilestone(n) {
+  const old = document.getElementById('milestone');
+  if (old) old.remove();
+  const m = MILESTONES[n];
+  const card = document.createElement('div');
+  card.id = 'milestone';
+  card.setAttribute('role', 'status');
+  card.innerHTML = '<div class="ms-num"></div><div class="ms-head"></div><div class="ms-sub"></div>';
+  card.querySelector('.ms-num').textContent = n;
+  card.querySelector('.ms-head').textContent = m.head;
+  card.querySelector('.ms-sub').textContent = m.sub;
+  document.body.appendChild(card);
+
+  const close = () => {
+    card.classList.add('out');
+    setTimeout(() => card.remove(), 520);
+  };
+  card.addEventListener('click', close);
+  setTimeout(close, 7000);
+
+  const w = window.innerWidth, h = window.innerHeight;
+  [0, 450, 900].forEach(d => setTimeout(() => burst(w * (0.25 + Math.random() * 0.5), h * (0.2 + Math.random() * 0.2), 34), d));
+}
+
+function checkMilestone() {
+  milestoneWaiting = false;
+  if (!wallLoaded) return;
+  if (helpOverlay.classList.contains('open')) { milestoneWaiting = true; return; }   // wait until the welcome box is closed
+  const n = cachedMessages.length;
+  const reached = Object.keys(MILESTONES).map(Number).filter(m => n >= m).sort((a, b) => a - b);
+  if (!reached.length) return;
+  const top = reached[reached.length - 1];
+  let seen = [];
+  try { seen = JSON.parse(localStorage.getItem(MILESTONE_KEY) || '[]'); } catch (e) {}
+  if (seen.includes(top) || milestoneSeenNow.has(top)) return;
+  reached.forEach(m => milestoneSeenNow.add(m));
+  try { localStorage.setItem(MILESTONE_KEY, JSON.stringify(Array.from(new Set(seen.concat(reached))))); } catch (e) {}
+  showMilestone(top);
 }
 
 function birthdayConfetti() {
@@ -3800,6 +3979,8 @@ function openHelp() {
 }
 
 function closeHelp() {
+  startMusic();
+  if (milestoneWaiting) setTimeout(checkMilestone, 700);
   helpOverlay.classList.remove('open');
   helpOverlay.setAttribute('aria-hidden', 'true');
   if (!skyIsOpen()) document.body.style.overflow = '';
