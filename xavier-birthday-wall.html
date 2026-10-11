@@ -1454,6 +1454,147 @@
   .calm .wish-count.loading,
   .calm .heart-btn.pop .h { animation: none; }
   .calm #star-field { display: none; }
+    /* ===== PRETTY MESSAGE BOX + COLOR WHEEL ===== */
+  @keyframes pn-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes pn-in { from { opacity: 0; transform: translateY(28px) scale(0.94); } to { opacity: 1; transform: none; } }
+  @keyframes pn-flow { from { background-position: 0 0, 0% 0; } to { background-position: 0 0, 300% 0; } }
+  @keyframes pn-twinkle { 0%, 100% { opacity: 0.25; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.15); } }
+  @keyframes pn-shine { 0% { transform: translateX(-120%) skewX(-20deg); } 60%, 100% { transform: translateX(300%) skewX(-20deg); } }
+
+  #overlay {
+    background: radial-gradient(circle at 50% 30%, rgba(185,166,224,0.38), rgba(74,67,86,0.58));
+    backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px);
+  }
+  #overlay.open { animation: pn-fade 0.3s ease both; }
+  #overlay.open #panel { animation: pn-in 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.15) both, pn-flow 9s linear infinite; }
+
+  #overlay #panel {
+    position: relative;
+    max-width: 440px;
+    padding: 34px 30px 28px;
+    border: 2px solid transparent;
+    border-radius: 22px;
+    background:
+      linear-gradient(165deg, #fffdfb 0%, #faf5ff 55%, #fff3f6 100%) padding-box,
+      linear-gradient(120deg, #b9a6e0, #eec3cf, #cbb98e, #d3e6f5, #b9a6e0) border-box;
+    background-size: 100% 100%, 300% 100%;
+    background-repeat: no-repeat, repeat-x;
+    box-shadow: 0 30px 80px rgba(120,90,170,0.35), 0 0 60px rgba(238,195,207,0.45);
+  }
+  /* little twinkling stars in the corner */
+  #overlay #panel::before {
+    content: ""; position: absolute; top: 16px; right: 20px; width: 86px; height: 46px; pointer-events: none;
+    background:
+      radial-gradient(circle 2.5px at 12% 28%, #e8a317 98%, transparent),
+      radial-gradient(circle 2px at 48% 72%, #b9a6e0 98%, transparent),
+      radial-gradient(circle 3px at 82% 24%, #ea6f98 98%, transparent),
+      radial-gradient(circle 1.5px at 66% 80%, #e8a317 98%, transparent);
+    animation: pn-twinkle 3.2s ease-in-out infinite;
+  }
+  #overlay #panel h2 {
+    font-size: 2rem; text-align: center; margin: 0 0 4px;
+    background: linear-gradient(90deg, #6d4f9c, #c9a36a 50%, #d9729a);
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent; -webkit-text-fill-color: transparent;
+  }
+  #overlay #panel h2::before, #overlay #panel h2::after { content: "✦"; font-size: 0.5em; margin: 0 10px; vertical-align: middle; }
+  #overlay #panel p.hint { text-align: center; margin-bottom: 22px; }
+  #overlay #panel label {
+    font-size: 0.74rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: #9a82cc; font-weight: 500; margin: 20px 0 8px;
+  }
+  #overlay #panel label::before { content: "✦ "; color: #e8a317; }
+
+  #overlay #panel input[type="text"], #overlay #panel textarea {
+    background: rgba(255,255,255,0.85);
+    border: 1.5px solid rgba(185,166,224,0.4);
+    border-radius: 12px; padding: 12px 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  #overlay #panel input[type="text"]:focus, #overlay #panel textarea:focus {
+    border-color: #c9a36a;
+    box-shadow: 0 0 0 4px rgba(203,185,142,0.22), 0 6px 22px rgba(185,166,224,0.3);
+  }
+
+  #overlay #panel .opt-btn {
+    padding: 8px 16px; border-radius: 999px;
+    background: rgba(255,255,255,0.75);
+    border: 1.5px solid rgba(185,166,224,0.45);
+    transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+  #overlay #panel .opt-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(185,166,224,0.35); }
+  #overlay #panel .opt-btn.selected {
+    background: linear-gradient(135deg, #b9a6e0, #e29ab8);
+    border-color: transparent; color: #fff;
+    box-shadow: 0 6px 18px rgba(185,166,224,0.6);
+  }
+  #overlay #panel .swatch {
+    width: 32px; height: 32px;
+    box-shadow: 0 3px 10px rgba(74,67,86,0.18), inset 0 0 0 2px rgba(255,255,255,0.65);
+    transition: transform 0.15s ease, box-shadow 0.2s ease;
+  }
+  #overlay #panel .swatch:hover { transform: scale(1.14); }
+  #overlay #panel .swatch.selected {
+    transform: scale(1.12);
+    box-shadow: 0 0 0 3px #fff, 0 0 0 5px #c9a36a, 0 0 18px rgba(232,163,23,0.55);
+  }
+  #overlay #padCanvas {
+    border: 1.5px dashed rgba(185,166,224,0.8); border-radius: 14px;
+    background: radial-gradient(rgba(185,166,224,0.28) 1px, transparent 1.5px) 0 0 / 18px 18px, #fff;
+  }
+  #overlay #panel .preview-wrap {
+    margin-top: 22px; padding: 22px 10px 14px; border-radius: 16px;
+    background: radial-gradient(circle at 50% 40%, rgba(185,166,224,0.16), transparent 72%);
+  }
+  #overlay #panel .actions { margin-top: 26px; align-items: center; }
+  #overlay #panel #cancelBtn { border-radius: 999px; padding: 12px 18px; }
+  #overlay #panel #submitBtn {
+    position: relative; overflow: hidden;
+    border-radius: 999px; padding: 12px 26px;
+    background: linear-gradient(135deg, #e8c76f, #cbb98e 50%, #e9a9bd);
+    color: #3c331a; font-weight: 600;
+    box-shadow: 0 8px 22px rgba(203,185,142,0.55);
+    transition: transform 0.15s ease, box-shadow 0.2s ease;
+  }
+  #overlay #panel #submitBtn:not(:disabled):hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 12px 28px rgba(232,163,23,0.45); }
+  #overlay #panel #submitBtn:not(:disabled)::after {
+    content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 40%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.65), transparent);
+    animation: pn-shine 3.4s ease-in-out infinite;
+  }
+  #overlay #panel #submitBtn:disabled { box-shadow: none; }
+
+  /* the color wheel */
+  #padColors .wheel-swatch {
+    position: relative;
+    background: conic-gradient(#ff5e5e, #ffd35e, #7dff7d, #5effff, #5e7dff, #ff5eff, #ff5e5e);
+    border-color: transparent !important;
+  }
+  #padColors .wheel-swatch::after {
+    content: ""; position: absolute; inset: 8px; border-radius: 50%;
+    background: var(--pick, #fff); box-shadow: 0 0 0 2px #fff;
+  }
+  #wheelPop {
+    display: none; margin-top: 12px; padding: 14px; gap: 18px;
+    align-items: center; justify-content: center; flex-wrap: wrap;
+    border-radius: 16px; background: rgba(255,255,255,0.8);
+    border: 1px solid rgba(185,166,224,0.4);
+    box-shadow: 0 12px 30px rgba(185,166,224,0.28);
+  }
+  #wheelPop.open { display: flex; animation: pn-fade 0.25s ease both; }
+  #wheelCv { width: 150px; height: 150px; border-radius: 50%; cursor: crosshair; touch-action: none; box-shadow: 0 0 0 4px #fff, 0 8px 22px rgba(74,67,86,0.22); }
+  .wheel-side { display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 0.72rem; color: #9a82cc; }
+  #wheelDot { width: 46px; height: 46px; border-radius: 50%; background: #e29ab8; box-shadow: 0 0 0 3px #fff, 0 6px 16px rgba(74,67,86,0.22); }
+  #wheelVal { width: 120px; accent-color: #b9a6e0; }
+
+  @media (max-width: 480px) {
+    #overlay #panel { padding: 28px 18px 22px; }
+    #overlay #panel h2 { font-size: 1.7rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #overlay.open, #overlay.open #panel, #overlay #panel::before, #overlay #panel #submitBtn::after { animation: none !important; }
+  }
+  .calm #overlay.open, .calm #overlay.open #panel, .calm #overlay #panel::before, .calm #overlay #panel #submitBtn::after { animation: none !important; }
 </style>
 </head>
 <body>
@@ -1529,6 +1670,15 @@
         <div class="swatch" data-pc="3" style="background:#e0a93b; border-color:#e0a93b;"></div>
         <div class="swatch" data-pc="4" style="background:#5b9bd5; border-color:#5b9bd5;"></div>
         <div class="swatch" data-pc="5" style="background:#5fae7a; border-color:#5fae7a;"></div>
+        <div class="swatch wheel-swatch" id="wheelSwatch" title="Pick any color"></div>
+      </div>
+         <div id="wheelPop">
+        <canvas id="wheelCv" width="150" height="150"></canvas>
+        <div class="wheel-side">
+          <div id="wheelDot"></div>
+          <span>Brightness</span>
+          <input type="range" id="wheelVal" min="25" max="100" value="100">
+        </div>
       </div>
       <div class="option-row pad-tools" id="padWidths">
         <button class="opt-btn" data-pw="0">Thin</button>
@@ -1807,7 +1957,7 @@ function cleanDoodle(raw) {
   for (const s of a) {
     if (!Array.isArray(s) || s.length < 4 || s.length % 2 !== 0) return null;
     const ci = Number(s[0]), wi = Number(s[1]);
-    if (!(ci >= 0 && ci < DOODLE_COLORS.length && ci % 1 === 0)) return null;
+    if (!(((ci >= 0 && ci < DOODLE_COLORS.length) || (ci >= 10 && ci <= 16777225)) && ci % 1 === 0)) return null;
     if (!(wi >= 0 && wi < DOODLE_WIDTHS.length && wi % 1 === 0)) return null;
     const row = [ci, wi];
     for (let j = 2; j < s.length; j += 2) {
@@ -1827,7 +1977,7 @@ function paintDoodle(ctx, strokes, scale) {
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
   for (const s of strokes) {
-    const color = DOODLE_COLORS[s[0]], width = DOODLE_WIDTHS[s[1]];
+    const color = s[0] >= 10 ? '#' + (s[0] - 10).toString(16).padStart(6, '0') : DOODLE_COLORS[s[0]], width = DOODLE_WIDTHS[s[1]];
     ctx.strokeStyle = color;
     ctx.fillStyle = color;
     ctx.lineWidth = width;
@@ -4454,6 +4604,78 @@ document.addEventListener('keydown', e => {
 });
 
 openHelp();
+
+/* ============================================================
+   COLOR WHEEL for the doodle pad. A custom color is saved as
+   10 + its color number, so 0-5 stay the six normal colors.
+   ============================================================ */
+(function () {
+  const wheelSwatch = document.getElementById('wheelSwatch');
+  const pop = document.getElementById('wheelPop');
+  const cv = document.getElementById('wheelCv');
+  const val = document.getElementById('wheelVal');
+  const dot = document.getElementById('wheelDot');
+  const wctx = cv.getContext('2d');
+  let H = 330, S = 0.55, V = 1;
+
+  function hsv(h, s, v) {
+    const f = n => { const k = (n + h / 60) % 6; return v - v * s * Math.max(Math.min(k, 4 - k, 1), 0); };
+    return [f(5), f(3), f(1)].map(x => Math.round(x * 255));
+  }
+
+  function drawWheel() {
+    const W = cv.width, R = W / 2, img = wctx.createImageData(W, W);
+    for (let y = 0; y < W; y++) {
+      for (let x = 0; x < W; x++) {
+        const dx = x - R + 0.5, dy = y - R + 0.5, d = Math.hypot(dx, dy);
+        if (d > R) continue;
+        const rgb = hsv((Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360, d / R, V);
+        const i = (y * W + x) * 4;
+        img.data[i] = rgb[0]; img.data[i + 1] = rgb[1]; img.data[i + 2] = rgb[2]; img.data[i + 3] = 255;
+      }
+    }
+    wctx.putImageData(img, 0, 0);
+    const a = H * Math.PI / 180;   // the little ring that shows the chosen spot
+    wctx.beginPath();
+    wctx.arc(R + Math.cos(a) * S * R, R + Math.sin(a) * S * R, 7, 0, Math.PI * 2);
+    wctx.lineWidth = 3; wctx.strokeStyle = '#fff'; wctx.stroke();
+    wctx.lineWidth = 1; wctx.strokeStyle = 'rgba(0,0,0,0.35)'; wctx.stroke();
+  }
+
+  function apply() {
+    const [r, g, b] = hsv(H, S, V);
+    const num = (r << 16) | (g << 8) | b;
+    const hex = '#' + num.toString(16).padStart(6, '0');
+    padColor = 10 + num;
+    wheelSwatch.style.setProperty('--pick', hex);
+    dot.style.background = hex;
+    document.querySelectorAll('#padColors .swatch').forEach(s => s.classList.toggle('selected', s === wheelSwatch));
+    drawWheel();
+  }
+
+  function pick(e) {
+    const r = cv.getBoundingClientRect(), R = r.width / 2;
+    const dx = e.clientX - r.left - R, dy = e.clientY - r.top - R;
+    H = (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
+    S = Math.min(1, Math.hypot(dx, dy) / R);
+    apply();
+  }
+
+  let dragging = false;
+  cv.addEventListener('pointerdown', e => { dragging = true; cv.setPointerCapture(e.pointerId); pick(e); });
+  cv.addEventListener('pointermove', e => { if (dragging) pick(e); });
+  cv.addEventListener('pointerup', () => { dragging = false; });
+  cv.addEventListener('pointercancel', () => { dragging = false; });
+  val.addEventListener('input', () => { V = Number(val.value) / 100; apply(); });
+  wheelSwatch.addEventListener('click', () => {
+    pop.classList.toggle('open');
+    if (pop.classList.contains('open')) apply();
+  });
+  document.getElementById('padColors').addEventListener('click', e => {
+    if (e.target.dataset.pc !== undefined) pop.classList.remove('open');   // a normal color was picked
+  });
+  drawWheel();
+})();
 
 /* init */
 applyScale();
