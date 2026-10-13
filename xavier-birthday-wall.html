@@ -3073,6 +3073,7 @@ function squash(raw){
 
 function findBannedMatch(text){
   if(!text) return null;
+   if(text.includes('🐺')) return '🐺';
   const squashed = squash(text);
   for(const term of STRICT_BANNED){
     if(squashed.includes(squash(term))) return term;
