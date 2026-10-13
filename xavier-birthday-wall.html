@@ -3055,16 +3055,20 @@ function normalizeWord(raw){
 }
 
 const STRICT_BANNED = [
-  'valko','wolf','ladsis6','ladsissix',
+  'valko','valkyrie','wolf','ladsis6','ladsissix',
   'groomer','groomiere','zayne','rafayel','sylus','caleb','jasmine',
   'bringbackvalko','valkoisloved',
   'cheater','boring','sleepy','musty','dusty','ugly',
-  'child','pedo',
+  'child','pedo','aoyin','loli',
   'nonexistent','cantcook','happydeathday'
 ];
 
 function squash(raw){
-  let s = raw.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'');
+    let s = raw.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'');
+  const LOOKALIKE = {'ł':'l','ø':'o','đ':'d','ħ':'h','ı':'i','ŧ':'t','ß':'s','æ':'a','œ':'o',
+    'а':'a','е':'e','о':'o','р':'p','с':'c','к':'k','х':'x','і':'i','у':'y','ѵ':'v','ӏ':'l',
+    'α':'a','ο':'o','κ':'k','ν':'v','ι':'i'};
+  s = s.split('').map(ch => LOOKALIKE[ch] || ch).join('');
   s = s.split('').map(ch => LEET_MAP[ch] || ch).join('');
   s = s.replace(/[^a-z0-9]/g, '');
   s = s.replace(/(.)\1+/g, '$1');
@@ -3073,7 +3077,8 @@ function squash(raw){
 
 function findBannedMatch(text){
   if(!text) return null;
-   if(text.includes('🐺')) return '🐺';
+    if(text.includes('🐺')) return '🐺';
+  if(/a[^a-z0-9]*w[^a-z0-9]*[o0][^a-z0-9]*[o0]/i.test(text)) return 'awoo';
   const squashed = squash(text);
   for(const term of STRICT_BANNED){
     if(squashed.includes(squash(term))) return term;
