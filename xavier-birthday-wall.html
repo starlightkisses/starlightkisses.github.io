@@ -3054,8 +3054,29 @@ function normalizeWord(raw){
   return s;
 }
 
+const STRICT_BANNED = [
+  'valko','wolf','ladsis6','ladsissix',
+  'groomer','groomiere','zayne','rafayel','sylus','caleb','jasmine',
+  'bringbackvalko','valkoisloved',
+  'cheater','boring','sleepy','musty','dusty','ugly',
+  'child','pedo',
+  'nonexistent','cantcook','happydeathday'
+];
+
+function squash(raw){
+  let s = raw.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'');
+  s = s.split('').map(ch => LEET_MAP[ch] || ch).join('');
+  s = s.replace(/[^a-z0-9]/g, '');
+  s = s.replace(/(.)\1+/g, '$1');
+  return s;
+}
+
 function findBannedMatch(text){
   if(!text) return null;
+  const squashed = squash(text);
+  for(const term of STRICT_BANNED){
+    if(squashed.includes(squash(term))) return term;
+  }
   const rawWords = text.split(/\s+/).filter(Boolean);
   const words = rawWords.map(normalizeWord);
 
