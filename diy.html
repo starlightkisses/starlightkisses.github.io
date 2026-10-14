@@ -915,8 +915,8 @@ footer{ display:none !important; }
   <footer>Pick a station, then choose your favorite — baked one layer at a time 🎂</footer>
 </div>
 
+<div id="ytMusicHolder" style="position:fixed;width:1px;height:1px;bottom:0;left:0;opacity:0;pointer-events:none;overflow:hidden;"></div>
 <div class="howto-overlay" id="howtoOverlay" role="dialog" aria-modal="true" aria-labelledby="howtoTitle" hidden>
-  <div class="howto-card">
     <button class="howto-x" id="howtoClose" aria-label="Close">✕</button>
     <div class="howto-head">
       <div class="howto-cake">🎂</div>
@@ -2476,19 +2476,61 @@ function closeHowto(){
 }
 document.getElementById('helpBtn').onclick = function(){ sparkleBurst(this); openHowto(); };
 document.getElementById('howtoClose').onclick = closeHowto;
-document.getElementById('howtoGo').onclick = function(){
-  closeHowto();
-  if(!document.getElementById('bgmFrame')){
-    var f = document.createElement('iframe');
-    f.id = 'bgmFrame';
-    f.src = 'https://www.youtube.com/embed/LbfoJBfiP_A?autoplay=1&loop=1&playlist=LbfoJBfiP_A&controls=0';
-    f.allow = 'autoplay';
-    f.style.cssText = 'position:fixed;width:1px;height:1px;bottom:0;left:0;opacity:0;pointer-events:none;border:0;';
-    document.body.appendChild(f);
-  }
-};
-setTimeout(openHowto, 600);
+document.getElementById('howtoGo').onclick = function(){ closeHowto(); startMusic(); };
 
+  /* ---- Background music (hidden YouTube player, starts on "Let's bake!") ---- */
+const MUSIC_VIDEO_ID = 'LbfoJBfiP_A';
+const MUSIC_VOLUME   = 60;                 // 0 - 100
+let ytPlayer = null, ytReady = false, musicStartRequested = false;
+
+function playMusicNow(){
+  try{ ytPlayer.setVolume(MUSIC_VOLUME); ytPlayer.unMute(); ytPlayer.playVideo(); }catch(e){}
+}
+function startMusic(){
+  if(musicStartRequested) return;
+  musicStartRequested = true;
+  if(!ytReady) return;
+  playMusicNow();
+  setTimeout(function(){
+    try{ if(ytPlayer.getPlayerState() !== 1) playMusicNow(); }catch(e){}
+  }, 1500);
+}
+function onMusicReady(){
+  ytReady = true;
+  try{ ytPlayer.setVolume(MUSIC_VOLUME); }catch(e){}
+  if(musicStartRequested) playMusicNow();
+}
+function onMusicState(e){
+  if(e.data === 0){ try{ ytPlayer.seekTo(0); ytPlayer.playVideo(); }catch(err){} }
+}
+function onMusicError(e){ console.warn('Background music error', e && e.data); }
+
+function startMusicPlayer(){
+  var q = new URLSearchParams({
+    enablejsapi:'1', autoplay:'0', controls:'0', loop:'1', playlist:MUSIC_VIDEO_ID,
+    playsinline:'1', rel:'0', modestbranding:'1', disablekb:'1', fs:'0'
+  });
+  if(location.protocol === 'http:' || location.protocol === 'https:') q.set('origin', location.origin);
+  var iframe = document.createElement('iframe');
+  iframe.src = 'https://www.youtube.com/embed/' + MUSIC_VIDEO_ID + '?' + q.toString();
+  iframe.title = 'Background music';
+  iframe.setAttribute('allow', 'autoplay; encrypted-media');
+  iframe.setAttribute('aria-hidden', 'true');
+  iframe.tabIndex = -1;
+  document.getElementById('ytMusicHolder').appendChild(iframe);
+
+  function makePlayer(){
+    ytPlayer = new YT.Player(iframe, { events:{ onReady:onMusicReady, onStateChange:onMusicState, onError:onMusicError } });
+  }
+  if(window.YT && window.YT.Player){ makePlayer(); return; }
+  var prev = window.onYouTubeIframeAPIReady;
+  window.onYouTubeIframeAPIReady = function(){ if(prev) prev(); makePlayer(); };
+  var tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+}
+startMusicPlayer();
+  
 /* ---- Undo: remembers each change and steps back one at a time ---- */
 const _undoStack = [];
 let _lastSnap = JSON.stringify(state);
