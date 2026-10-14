@@ -917,6 +917,7 @@ footer{ display:none !important; }
 
 <div id="ytMusicHolder" style="position:fixed;width:1px;height:1px;bottom:0;left:0;opacity:0;pointer-events:none;overflow:hidden;"></div>
 <div class="howto-overlay" id="howtoOverlay" role="dialog" aria-modal="true" aria-labelledby="howtoTitle" hidden>
+    <div class="howto-card">
     <button class="howto-x" id="howtoClose" aria-label="Close">✕</button>
     <div class="howto-head">
       <div class="howto-cake">🎂</div>
@@ -2477,6 +2478,7 @@ function closeHowto(){
 document.getElementById('helpBtn').onclick = function(){ sparkleBurst(this); openHowto(); };
 document.getElementById('howtoClose').onclick = closeHowto;
 document.getElementById('howtoGo').onclick = function(){ closeHowto(); startMusic(); };
+  setTimeout(openHowto, 600);
 
   /* ---- Background music (hidden YouTube player, starts on "Let's bake!") ---- */
 const MUSIC_VIDEO_ID = 'LbfoJBfiP_A';
