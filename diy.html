@@ -2476,7 +2476,17 @@ function closeHowto(){
 }
 document.getElementById('helpBtn').onclick = function(){ sparkleBurst(this); openHowto(); };
 document.getElementById('howtoClose').onclick = closeHowto;
-document.getElementById('howtoGo').onclick = closeHowto;
+document.getElementById('howtoGo').onclick = function(){
+  closeHowto();
+  if(!document.getElementById('bgmFrame')){
+    var f = document.createElement('iframe');
+    f.id = 'bgmFrame';
+    f.src = 'https://www.youtube.com/embed/LbfoJBfiP_A?autoplay=1&loop=1&playlist=LbfoJBfiP_A&controls=0';
+    f.allow = 'autoplay';
+    f.style.cssText = 'position:fixed;width:1px;height:1px;bottom:0;left:0;opacity:0;pointer-events:none;border:0;';
+    document.body.appendChild(f);
+  }
+};
 setTimeout(openHowto, 600);
 
 /* ---- Undo: remembers each change and steps back one at a time ---- */
